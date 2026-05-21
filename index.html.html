@@ -1,0 +1,2517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WildJourney — Explore the World's Wild Places</title>
+<meta name="description" content="Premium nature, wildlife, travel and adventure articles. Discover the world's most breathtaking destinations and wild places.">
+<meta name="keywords" content="nature, travel, wildlife, adventure, lifestyle, outdoor, exploration">
+<meta property="og:title" content="WildJourney — Explore the World's Wild Places">
+<meta property="og:description" content="Premium nature, wildlife, travel and adventure articles.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://wildjourney.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --gold: #C8973A;
+    --gold-light: #E8B96A;
+    --green-deep: #1A3028;
+    --green-mid: #2D5040;
+    --green-accent: #4A8C6A;
+    --green-glow: #6BBF8E;
+    --cream: #F5EDD8;
+    --cream-dark: #E8D9BC;
+    --dark-bg: #0A0F0C;
+    --dark-surface: #111915;
+    --dark-card: #141E18;
+    --dark-glass: rgba(20,30,24,0.85);
+    --dark-border: rgba(106,191,142,0.12);
+    --dark-border-strong: rgba(106,191,142,0.25);
+    --text-primary: #F0EAD6;
+    --text-secondary: #A8B8A0;
+    --text-muted: #607060;
+    --red-accent: #C85A3A;
+    --blue-accent: #3A7AC8;
+    --transition: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  [data-theme="light"] {
+    --dark-bg: #F5F0E8;
+    --dark-surface: #FFFEF8;
+    --dark-card: #FFFFFF;
+    --dark-glass: rgba(255,255,255,0.85);
+    --dark-border: rgba(42,80,64,0.12);
+    --dark-border-strong: rgba(42,80,64,0.25);
+    --text-primary: #1A3028;
+    --text-secondary: #3D5A4A;
+    --text-muted: #7A9080;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--dark-bg);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    transition: background 0.4s, color 0.4s;
+  }
+
+  /* ===================== SCROLLBAR ===================== */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--dark-bg); }
+  ::-webkit-scrollbar-thumb { background: var(--green-accent); border-radius: 3px; }
+
+  /* ===================== NAV ===================== */
+  #nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    padding: 0 2rem;
+    background: rgba(10,15,12,0.7);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border-bottom: 1px solid var(--dark-border);
+    transition: all 0.3s var(--transition);
+  }
+  [data-theme="light"] #nav { background: rgba(245,240,232,0.7); }
+  #nav.scrolled { padding: 0 2rem; box-shadow: 0 4px 40px rgba(0,0,0,0.3); }
+  .nav-inner {
+    max-width: 1400px; margin: 0 auto;
+    display: flex; align-items: center; gap: 2rem;
+    height: 68px;
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 900;
+    color: var(--gold);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+    display: flex; align-items: center; gap: 0.5rem;
+    flex-shrink: 0;
+  }
+  .logo-icon { width: 32px; height: 32px; }
+  .nav-links {
+    display: flex; align-items: center; gap: 0.25rem;
+    flex: 1;
+    list-style: none;
+  }
+  .nav-links a {
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 0.875rem; font-weight: 500;
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--text-primary); background: var(--dark-border); }
+  .nav-actions { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+  .nav-search-btn, .theme-toggle {
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 1px solid var(--dark-border-strong);
+    background: transparent; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-secondary); font-size: 1rem;
+    transition: all 0.2s;
+  }
+  .nav-search-btn:hover, .theme-toggle:hover { background: var(--dark-border); color: var(--text-primary); }
+  /* admin button removed - access via secret shortcut only */
+  .hamburger {
+    display: none; width: 38px; height: 38px; border: none;
+    background: transparent; cursor: pointer; flex-direction: column;
+    align-items: center; justify-content: center; gap: 5px;
+  }
+  .hamburger span { width: 22px; height: 2px; background: var(--text-primary); border-radius: 2px; transition: all 0.3s; }
+
+  /* ===================== SEARCH OVERLAY ===================== */
+  #search-overlay {
+    position: fixed; inset: 0; z-index: 2000;
+    background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+    display: none; align-items: flex-start; justify-content: center;
+    padding-top: 10vh;
+  }
+  #search-overlay.open { display: flex; }
+  .search-box {
+    width: 90%; max-width: 680px;
+    background: var(--dark-surface);
+    border: 1px solid var(--dark-border-strong);
+    border-radius: 16px; overflow: hidden;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+  }
+  .search-input-wrap {
+    display: flex; align-items: center; gap: 1rem; padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--dark-border);
+  }
+  .search-input-wrap input {
+    flex: 1; background: none; border: none; outline: none;
+    font-family: 'DM Sans', sans-serif; font-size: 1.1rem;
+    color: var(--text-primary);
+  }
+  .search-input-wrap input::placeholder { color: var(--text-muted); }
+  .search-results { max-height: 400px; overflow-y: auto; padding: 0.75rem; }
+  .search-result-item {
+    padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer;
+    transition: background 0.15s;
+    display: flex; gap: 1rem; align-items: center;
+  }
+  .search-result-item:hover { background: var(--dark-border); }
+  .search-result-img { width: 56px; height: 40px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+  .search-result-text h4 { font-size: 0.9rem; font-weight: 500; color: var(--text-primary); }
+  .search-result-text p { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+  .search-close {
+    width: 36px; height: 36px; border: none; background: none;
+    cursor: pointer; color: var(--text-muted); font-size: 1.4rem; flex-shrink: 0;
+  }
+
+  /* ===================== HERO ===================== */
+  #hero {
+    position: relative; min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    background: var(--dark-bg);
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg, #0A1A12 0%, #0F1F16 40%, #0A1510 70%, #080D0A 100%);
+  }
+  .hero-grid-lines {
+    position: absolute; inset: 0; opacity: 0.03;
+    background-image:
+      linear-gradient(var(--green-glow) 1px, transparent 1px),
+      linear-gradient(90deg, var(--green-glow) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-orb {
+    position: absolute; border-radius: 50%; filter: blur(120px); pointer-events: none;
+  }
+  .hero-orb-1 { width: 700px; height: 700px; top: -200px; right: -200px; background: radial-gradient(circle, rgba(74,140,106,0.15) 0%, transparent 70%); }
+  .hero-orb-2 { width: 500px; height: 500px; bottom: -100px; left: -100px; background: radial-gradient(circle, rgba(200,151,58,0.1) 0%, transparent 70%); }
+  .hero-featured-img {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+    opacity: 0; transition: opacity 1s;
+  }
+  .hero-featured-img.loaded { opacity: 0.25; }
+  .hero-gradient-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, var(--dark-bg) 0%, rgba(10,15,12,0.6) 50%, rgba(10,15,12,0.3) 100%);
+  }
+  .hero-content {
+    position: relative; z-index: 2;
+    text-align: center; max-width: 900px; padding: 0 2rem;
+    padding-top: 80px;
+  }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.35rem 1rem;
+    background: rgba(200,151,58,0.1);
+    border: 1px solid rgba(200,151,58,0.3);
+    border-radius: 100px; color: var(--gold);
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.8s var(--transition) both;
+  }
+  .eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 900; line-height: 0.95;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    animation: fadeUp 0.8s 0.1s var(--transition) both;
+  }
+  .hero-title .accent { color: var(--gold); font-style: italic; }
+  .hero-title .green-line { color: var(--green-glow); }
+  .hero-subtitle {
+    font-size: 1.1rem; color: var(--text-secondary);
+    max-width: 560px; margin: 1.5rem auto 2.5rem;
+    line-height: 1.7; font-weight: 300;
+    animation: fadeUp 0.8s 0.2s var(--transition) both;
+  }
+  .hero-cta {
+    display: flex; align-items: center; justify-content: center; gap: 1rem;
+    flex-wrap: wrap;
+    animation: fadeUp 0.8s 0.3s var(--transition) both;
+  }
+  .btn-primary {
+    padding: 0.875rem 2rem;
+    background: var(--gold); color: #000;
+    border: none; border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; transition: all 0.25s;
+    letter-spacing: 0.02em;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;
+  }
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(200,151,58,0.3); }
+  .btn-secondary {
+    padding: 0.875rem 2rem;
+    background: transparent; color: var(--text-primary);
+    border: 1px solid var(--dark-border-strong);
+    border-radius: 8px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem; font-weight: 500; cursor: pointer;
+    transition: all 0.25s; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+  }
+  .btn-secondary:hover { background: var(--dark-border); border-color: var(--green-accent); }
+  .hero-scroll-indicator {
+    position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    animation: fadeUp 1s 1s var(--transition) both;
+    cursor: pointer;
+  }
+  .scroll-text { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); }
+  .scroll-line { width: 1px; height: 48px; background: linear-gradient(to bottom, var(--text-muted), transparent); animation: scrollLine 2s infinite; }
+  @keyframes scrollLine { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform: scaleY(1); transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+
+  /* ===================== SECTIONS ===================== */
+  .section { padding: 6rem 2rem; }
+  .section-inner { max-width: 1400px; margin: 0 auto; }
+  .section-header { margin-bottom: 3rem; }
+  .section-label {
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem;
+    display: flex; align-items: center; gap: 0.75rem;
+  }
+  .section-label::after { content: ''; flex: 1; max-width: 40px; height: 1px; background: var(--gold); opacity: 0.4; }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700; line-height: 1.1;
+    letter-spacing: -0.02em; color: var(--text-primary);
+  }
+  .section-subtitle { font-size: 1rem; color: var(--text-secondary); margin-top: 0.75rem; max-width: 500px; }
+
+  /* ===================== CATEGORIES BAR ===================== */
+  #categories-bar {
+    background: var(--dark-surface);
+    border-bottom: 1px solid var(--dark-border);
+    position: sticky; top: 68px; z-index: 100;
+  }
+  .cats-inner {
+    max-width: 1400px; margin: 0 auto; padding: 0 2rem;
+    display: flex; align-items: center; gap: 0.5rem;
+    overflow-x: auto; scrollbar-width: none; height: 52px;
+  }
+  .cats-inner::-webkit-scrollbar { display: none; }
+  .cat-pill {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.35rem 0.875rem; border-radius: 100px;
+    border: 1px solid var(--dark-border);
+    color: var(--text-secondary); font-size: 0.8rem; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    text-decoration: none; background: none;
+  }
+  .cat-pill:hover, .cat-pill.active {
+    border-color: var(--green-accent); background: rgba(74,140,106,0.1);
+    color: var(--green-glow);
+  }
+  .cat-pill.active { font-weight: 600; }
+
+  /* ===================== FEATURED ARTICLE (LARGE) ===================== */
+  .featured-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 2px; border-radius: 20px; overflow: hidden;
+    background: var(--dark-border);
+  }
+  .article-card-featured {
+    position: relative; overflow: hidden;
+    background: var(--dark-card);
+    cursor: pointer; group: true;
+  }
+  .article-card-featured.span2 { grid-column: span 2; }
+  .article-card-featured img {
+    width: 100%; height: 500px; object-fit: cover;
+    transition: transform 0.6s var(--transition);
+  }
+  .article-card-featured.small img { height: 320px; }
+  .article-card-featured:hover img { transform: scale(1.04); }
+  .article-card-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(5,10,7,0.95) 0%, rgba(5,10,7,0.5) 50%, transparent 100%);
+  }
+  .article-card-body {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 2rem;
+  }
+  .article-cat-badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    background: var(--gold); color: #000;
+    border-radius: 4px; font-size: 0.65rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 0.75rem;
+  }
+  .article-cat-badge.nature { background: var(--green-accent); color: #fff; }
+  .article-cat-badge.wildlife { background: #3A7AC8; color: #fff; }
+  .article-cat-badge.adventure { background: #C85A3A; color: #fff; }
+  .article-cat-badge.lifestyle { background: #8A5AC8; color: #fff; }
+  .article-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem; font-weight: 700;
+    color: #fff; line-height: 1.2;
+    margin-bottom: 0.75rem;
+  }
+  .article-card-featured.small .article-card-title { font-size: 1.1rem; }
+  .article-meta {
+    display: flex; align-items: center; gap: 0.75rem;
+    font-size: 0.75rem; color: rgba(255,255,255,0.6);
+  }
+  .article-meta-sep { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.3); }
+  .read-more-arrow {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    color: var(--gold); font-size: 0.8rem; font-weight: 600;
+    margin-top: 0.75rem; opacity: 0; transition: opacity 0.3s;
+  }
+  .article-card-featured:hover .read-more-arrow { opacity: 1; }
+
+  /* ===================== ARTICLE GRID ===================== */
+  .articles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+  .article-card {
+    background: var(--dark-card);
+    border: 1px solid var(--dark-border);
+    border-radius: 16px; overflow: hidden; cursor: pointer;
+    transition: all 0.3s var(--transition);
+    display: flex; flex-direction: column;
+  }
+  .article-card:hover { transform: translateY(-4px); border-color: var(--dark-border-strong); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+  .article-card-img-wrap { position: relative; overflow: hidden; }
+  .article-card-img-wrap img { width: 100%; height: 220px; object-fit: cover; transition: transform 0.5s var(--transition); }
+  .article-card:hover .article-card-img-wrap img { transform: scale(1.05); }
+  .article-card-content { padding: 1.25rem; flex: 1; display: flex; flex-direction: column; }
+  .article-card-title-sm {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem; font-weight: 700;
+    color: var(--text-primary); line-height: 1.3; margin: 0.5rem 0 0.75rem;
+    flex: 1;
+  }
+  .article-excerpt { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem; }
+  .article-footer-meta {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 0.75rem; border-top: 1px solid var(--dark-border);
+    font-size: 0.75rem; color: var(--text-muted);
+  }
+  .author-mini { display: flex; align-items: center; gap: 0.5rem; }
+  .author-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--green-mid); display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; font-weight: 700; color: var(--green-glow);
+  }
+  .read-time { display: flex; align-items: center; gap: 0.3rem; }
+
+  /* ===================== TRENDING SIDEBAR ===================== */
+  .content-sidebar-layout {
+    display: grid; grid-template-columns: 1fr 340px; gap: 3rem;
+  }
+  .trending-list { display: flex; flex-direction: column; gap: 1px; }
+  .trending-item {
+    display: flex; gap: 1rem; align-items: flex-start;
+    padding: 1rem; border-radius: 10px; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .trending-item:hover { background: var(--dark-border); }
+  .trending-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem; font-weight: 900; line-height: 1;
+    color: var(--dark-border-strong); flex-shrink: 0; width: 32px;
+    text-align: right;
+  }
+  .trending-content h4 { font-size: 0.875rem; font-weight: 600; color: var(--text-primary); line-height: 1.35; margin-bottom: 0.3rem; }
+  .trending-content p { font-size: 0.75rem; color: var(--text-muted); }
+  .sidebar-widget {
+    background: var(--dark-card); border: 1px solid var(--dark-border);
+    border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem;
+  }
+  .sidebar-widget h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem;
+  }
+  .tag-cloud { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .tag {
+    padding: 0.3rem 0.75rem; background: var(--dark-border);
+    border: 1px solid var(--dark-border-strong);
+    border-radius: 100px; font-size: 0.75rem; color: var(--text-secondary);
+    cursor: pointer; transition: all 0.2s; text-decoration: none;
+  }
+  .tag:hover { background: rgba(74,140,106,0.15); border-color: var(--green-accent); color: var(--green-glow); }
+  .ad-placeholder {
+    background: linear-gradient(135deg, var(--dark-card), var(--dark-surface));
+    border: 1px dashed var(--dark-border-strong); border-radius: 12px;
+    height: 250px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: var(--text-muted); font-size: 0.8rem; gap: 0.5rem;
+  }
+  .ad-label { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.5; }
+
+  /* ===================== NEWSLETTER ===================== */
+  #newsletter {
+    background: linear-gradient(135deg, var(--green-deep), #0F2A20);
+    border-top: 1px solid var(--dark-border); border-bottom: 1px solid var(--dark-border);
+  }
+  .newsletter-inner {
+    max-width: 1400px; margin: 0 auto; padding: 5rem 2rem;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+  }
+  .newsletter-text h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem; font-weight: 700; color: var(--text-primary);
+    margin-bottom: 1rem;
+  }
+  .newsletter-text p { color: var(--text-secondary); line-height: 1.7; }
+  .newsletter-form { display: flex; flex-direction: column; gap: 1rem; }
+  .newsletter-input-group { display: flex; gap: 0; }
+  .newsletter-input-group input {
+    flex: 1; padding: 0.875rem 1.25rem;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--dark-border-strong);
+    border-right: none; border-radius: 8px 0 0 8px;
+    color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; outline: none;
+  }
+  .newsletter-input-group input:focus { border-color: var(--green-accent); }
+  .newsletter-input-group input::placeholder { color: var(--text-muted); }
+  .newsletter-input-group button {
+    padding: 0 1.5rem; background: var(--gold); border: 1px solid var(--gold);
+    color: #000; border-radius: 0 8px 8px 0; font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .newsletter-input-group button:hover { background: var(--gold-light); }
+  .newsletter-note { font-size: 0.75rem; color: var(--text-muted); }
+
+  /* ===================== FOOTER ===================== */
+  footer {
+    background: #070C09; padding: 4rem 2rem 2rem;
+    border-top: 1px solid var(--dark-border);
+  }
+  .footer-inner { max-width: 1400px; margin: 0 auto; }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
+  .footer-brand { }
+  .footer-logo {
+    font-family: 'Playfair Display', serif; font-size: 1.5rem;
+    font-weight: 900; color: var(--gold); display: block; margin-bottom: 1rem;
+  }
+  .footer-tagline { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 1.5rem; }
+  .social-links { display: flex; gap: 0.75rem; }
+  .social-link {
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 1px solid var(--dark-border-strong);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); text-decoration: none;
+    font-size: 0.85rem; transition: all 0.2s;
+  }
+  .social-link:hover { border-color: var(--green-accent); color: var(--green-glow); background: rgba(74,140,106,0.1); }
+  .footer-col h4 {
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.25rem;
+  }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+  .footer-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--green-glow); }
+  .footer-bottom {
+    border-top: 1px solid var(--dark-border); padding-top: 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 0.8rem; color: var(--text-muted);
+    flex-wrap: wrap; gap: 1rem;
+  }
+  .footer-legal a { color: var(--text-muted); text-decoration: none; margin-left: 1.5rem; transition: color 0.2s; }
+  .footer-legal a:hover { color: var(--text-secondary); }
+
+  /* ===================== ARTICLE PAGE ===================== */
+  #article-page { display: none; min-height: 100vh; }
+  .article-hero {
+    position: relative; height: 75vh; min-height: 500px;
+    display: flex; align-items: flex-end; overflow: hidden;
+  }
+  .article-hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .article-hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(5,10,7,0.98) 0%, rgba(5,10,7,0.5) 50%, rgba(5,10,7,0.2) 100%);
+  }
+  .article-hero-content { position: relative; z-index: 2; padding: 3rem; max-width: 900px; }
+  .article-page-cat { margin-bottom: 1rem; }
+  .article-page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 1.5rem;
+  }
+  .article-page-meta { display: flex; align-items: center; gap: 1rem; font-size: 0.85rem; color: rgba(255,255,255,0.6); flex-wrap: wrap; }
+  .article-page-meta .author { color: var(--gold); font-weight: 600; }
+  .article-body-wrap {
+    max-width: 800px; margin: 0 auto; padding: 4rem 2rem;
+  }
+  .article-body {
+    font-size: 1.125rem; line-height: 1.85;
+    color: var(--text-secondary); font-weight: 300;
+  }
+  .article-body h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem; font-weight: 700;
+    color: var(--text-primary); margin: 2.5rem 0 1rem;
+  }
+  .article-body p { margin-bottom: 1.5rem; }
+  .article-body blockquote {
+    border-left: 3px solid var(--gold); padding: 1rem 1.5rem;
+    background: rgba(200,151,58,0.05); border-radius: 0 8px 8px 0;
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 1.25rem; color: var(--text-primary); margin: 2rem 0;
+  }
+  .article-share {
+    display: flex; align-items: center; gap: 1rem; margin: 3rem 0;
+    padding: 1.5rem; background: var(--dark-card); border-radius: 12px;
+    border: 1px solid var(--dark-border);
+  }
+  .article-share span { font-size: 0.875rem; font-weight: 600; color: var(--text-primary); }
+  .share-btn {
+    padding: 0.4rem 1rem; border-radius: 6px; border: 1px solid var(--dark-border-strong);
+    background: none; color: var(--text-secondary); font-size: 0.8rem; cursor: pointer; transition: all 0.2s;
+  }
+  .share-btn:hover { background: var(--dark-border); color: var(--text-primary); }
+  .comments-section { margin-top: 3rem; }
+  .comments-section h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1.5rem; }
+  .comment-form textarea {
+    width: 100%; min-height: 120px; padding: 1rem;
+    background: var(--dark-card); border: 1px solid var(--dark-border);
+    border-radius: 8px; color: var(--text-primary); font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem; outline: none; resize: vertical; margin-bottom: 1rem;
+  }
+  .comment-form textarea:focus { border-color: var(--green-accent); }
+  .comment-item {
+    padding: 1.25rem; background: var(--dark-card);
+    border: 1px solid var(--dark-border); border-radius: 10px; margin-bottom: 1rem;
+  }
+  .comment-author { font-weight: 600; color: var(--text-primary); font-size: 0.9rem; margin-bottom: 0.25rem; }
+  .comment-date { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem; }
+  .comment-text { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; }
+
+  /* ===================== ADMIN PANEL ===================== */
+  #admin-login, #admin-panel { display: none; }
+  .admin-login-wrap {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: var(--dark-bg); padding: 2rem;
+  }
+  .admin-login-card {
+    width: 100%; max-width: 420px;
+    background: var(--dark-card); border: 1px solid var(--dark-border-strong);
+    border-radius: 20px; padding: 3rem;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+  }
+  .admin-login-logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 900; color: var(--gold); text-align: center; margin-bottom: 0.5rem; }
+  .admin-login-sub { text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2.5rem; }
+  .form-group { margin-bottom: 1.25rem; }
+  .form-label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; letter-spacing: 0.05em; }
+  .form-input {
+    width: 100%; padding: 0.75rem 1rem;
+    background: var(--dark-surface); border: 1px solid var(--dark-border-strong);
+    border-radius: 8px; color: var(--text-primary); font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem; outline: none; transition: border-color 0.2s;
+  }
+  .form-input:focus { border-color: var(--green-accent); }
+  .form-input::placeholder { color: var(--text-muted); }
+  .btn-full { width: 100%; padding: 0.875rem; background: var(--gold); border: none; border-radius: 8px; color: #000; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+  .btn-full:hover { background: var(--gold-light); }
+  .login-error { display: none; background: rgba(200,90,58,0.1); border: 1px solid rgba(200,90,58,0.3); border-radius: 6px; padding: 0.75rem; font-size: 0.8rem; color: #E07060; text-align: center; margin-top: 1rem; }
+
+  /* Admin Layout */
+  .admin-layout { display: flex; min-height: 100vh; }
+  .admin-sidebar {
+    width: 260px; flex-shrink: 0;
+    background: var(--dark-surface); border-right: 1px solid var(--dark-border);
+    padding: 1.5rem 0; position: fixed; top: 0; left: 0; bottom: 0;
+    overflow-y: auto; z-index: 100;
+  }
+  .admin-sidebar-logo {
+    font-family: 'Playfair Display', serif; font-size: 1.25rem;
+    font-weight: 900; color: var(--gold); padding: 0 1.5rem; margin-bottom: 2rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .admin-nav { list-style: none; }
+  .admin-nav li a, .admin-nav li button {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.7rem 1.5rem; width: 100%;
+    color: var(--text-secondary); text-decoration: none;
+    font-size: 0.875rem; font-weight: 500;
+    border: none; background: none; cursor: pointer;
+    transition: all 0.2s; text-align: left;
+  }
+  .admin-nav li a:hover, .admin-nav li button:hover { color: var(--text-primary); background: var(--dark-border); }
+  .admin-nav li a.active, .admin-nav li button.active { color: var(--green-glow); background: rgba(74,140,106,0.1); border-right: 2px solid var(--green-accent); }
+  .admin-nav .nav-section-label {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--text-muted);
+    padding: 1.5rem 1.5rem 0.5rem;
+  }
+  .admin-nav .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+  .admin-content {
+    margin-left: 260px; flex: 1; padding: 2rem;
+    min-height: 100vh; background: var(--dark-bg);
+  }
+  .admin-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 2rem; padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--dark-border);
+  }
+  .admin-header h1 { font-family: 'Playfair Display', serif; font-size: 1.75rem; font-weight: 700; color: var(--text-primary); }
+  .admin-panel-section { display: none; }
+  .admin-panel-section.active { display: block; }
+
+  /* Stats Cards */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
+  .stat-card {
+    background: var(--dark-card); border: 1px solid var(--dark-border);
+    border-radius: 12px; padding: 1.25rem;
+  }
+  .stat-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; }
+  .stat-value { font-size: 2rem; font-weight: 700; color: var(--text-primary); font-family: 'DM Mono', monospace; }
+  .stat-change { font-size: 0.75rem; margin-top: 0.25rem; }
+  .stat-change.up { color: #4A8C6A; }
+  .stat-change.down { color: #C85A3A; }
+
+  /* Admin Table */
+  .admin-table-wrap { background: var(--dark-card); border: 1px solid var(--dark-border); border-radius: 12px; overflow: hidden; }
+  .admin-table { width: 100%; border-collapse: collapse; }
+  .admin-table th {
+    text-align: left; padding: 0.875rem 1rem;
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-muted); background: var(--dark-surface);
+    border-bottom: 1px solid var(--dark-border);
+  }
+  .admin-table td { padding: 0.875rem 1rem; font-size: 0.875rem; color: var(--text-secondary); border-bottom: 1px solid var(--dark-border); }
+  .admin-table tr:last-child td { border-bottom: none; }
+  .admin-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .admin-table .status { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700; }
+  .status.published { background: rgba(74,140,106,0.15); color: var(--green-glow); }
+  .status.draft { background: rgba(200,151,58,0.15); color: var(--gold); }
+  .action-btns { display: flex; gap: 0.5rem; }
+  .btn-sm {
+    padding: 0.3rem 0.6rem; border-radius: 5px; font-size: 0.75rem; font-weight: 600;
+    cursor: pointer; border: 1px solid; transition: all 0.15s;
+  }
+  .btn-edit { border-color: var(--blue-accent); color: var(--blue-accent); background: transparent; }
+  .btn-edit:hover { background: rgba(58,122,200,0.1); }
+  .btn-delete { border-color: var(--red-accent); color: var(--red-accent); background: transparent; }
+  .btn-delete:hover { background: rgba(200,90,58,0.1); }
+  .btn-view { border-color: var(--green-accent); color: var(--green-glow); background: transparent; }
+  .btn-view:hover { background: rgba(74,140,106,0.1); }
+
+  /* Article Editor */
+  .editor-form { background: var(--dark-card); border: 1px solid var(--dark-border); border-radius: 12px; padding: 2rem; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  .form-textarea {
+    width: 100%; min-height: 300px; padding: 1rem;
+    background: var(--dark-surface); border: 1px solid var(--dark-border-strong);
+    border-radius: 8px; color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+    outline: none; resize: vertical; line-height: 1.6;
+    transition: border-color 0.2s;
+  }
+  .form-textarea:focus { border-color: var(--green-accent); }
+  .form-select {
+    width: 100%; padding: 0.75rem 1rem;
+    background: var(--dark-surface); border: 1px solid var(--dark-border-strong);
+    border-radius: 8px; color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; outline: none;
+    appearance: none; cursor: pointer;
+  }
+  .upload-zone {
+    border: 2px dashed var(--dark-border-strong); border-radius: 10px;
+    padding: 2rem; text-align: center; cursor: pointer;
+    transition: all 0.2s; background: var(--dark-surface);
+  }
+  .upload-zone:hover { border-color: var(--green-accent); background: rgba(74,140,106,0.05); }
+  .upload-zone-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+  .upload-zone p { font-size: 0.85rem; color: var(--text-muted); }
+  .editor-toolbar {
+    display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;
+  }
+  .toolbar-btn {
+    padding: 0.3rem 0.6rem; border: 1px solid var(--dark-border-strong);
+    border-radius: 5px; background: var(--dark-surface); color: var(--text-secondary);
+    font-size: 0.8rem; cursor: pointer; transition: all 0.15s;
+  }
+  .toolbar-btn:hover { background: var(--dark-border); color: var(--text-primary); }
+  .seo-score {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.75rem 1rem; border-radius: 8px;
+    border: 1px solid var(--dark-border); background: var(--dark-surface);
+  }
+  .seo-score-circle {
+    width: 42px; height: 42px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 700; flex-shrink: 0;
+  }
+  .seo-score-circle.good { background: rgba(74,140,106,0.2); color: var(--green-glow); border: 2px solid var(--green-accent); }
+  .seo-score-circle.ok { background: rgba(200,151,58,0.2); color: var(--gold); border: 2px solid var(--gold); }
+
+  /* Analytics Charts */
+  .chart-area { background: var(--dark-card); border: 1px solid var(--dark-border); border-radius: 12px; padding: 1.5rem; }
+  .chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+  .chart-title { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+  .mini-bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 100px; }
+  .mini-bar {
+    flex: 1; background: linear-gradient(to top, var(--green-accent), var(--green-glow));
+    border-radius: 3px 3px 0 0; transition: opacity 0.2s; opacity: 0.7;
+    min-width: 8px;
+  }
+  .mini-bar:hover { opacity: 1; }
+
+  /* AI Generator */
+  .ai-prompt-area { background: var(--dark-card); border: 1px solid var(--dark-border); border-radius: 12px; padding: 1.5rem; }
+  .ai-loading { display: none; align-items: center; gap: 0.75rem; padding: 1rem; }
+  .ai-loading.active { display: flex; }
+  .ai-dots span { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--green-glow); margin: 0 2px; animation: aiDot 1.2s infinite; }
+  .ai-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .ai-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes aiDot { 0%,80%,100% { transform: scale(0.7); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+
+  /* Notification Toast */
+  #toast {
+    position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;
+    background: var(--dark-card); border: 1px solid var(--dark-border-strong);
+    border-radius: 10px; padding: 1rem 1.5rem;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    transform: translateY(80px); opacity: 0; transition: all 0.3s var(--transition);
+    max-width: 320px;
+  }
+  #toast.show { transform: translateY(0); opacity: 1; }
+  #toast.success { border-left: 3px solid var(--green-accent); }
+  #toast.error { border-left: 3px solid var(--red-accent); }
+  .toast-title { font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem; }
+  .toast-msg { font-size: 0.8rem; color: var(--text-secondary); }
+
+  /* Mobile Menu */
+  .mobile-menu {
+    display: none; position: fixed; inset: 0; z-index: 999;
+    background: var(--dark-bg); padding: 5rem 2rem 2rem;
+    flex-direction: column; gap: 0.5rem;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    font-size: 1.25rem; font-weight: 600; color: var(--text-primary);
+    text-decoration: none; padding: 0.75rem 0;
+    border-bottom: 1px solid var(--dark-border);
+    transition: color 0.2s;
+  }
+  .mobile-menu a:hover { color: var(--gold); }
+
+  /* Misc Utilities */
+  .glass {
+    background: var(--dark-glass);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--dark-border);
+  }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+  .text-gold { color: var(--gold); }
+  .text-green { color: var(--green-glow); }
+  .divider { height: 1px; background: var(--dark-border); margin: 2rem 0; }
+  .badge-new {
+    display: inline-block; padding: 0.15rem 0.5rem;
+    background: rgba(106,191,142,0.2); border: 1px solid rgba(106,191,142,0.4);
+    border-radius: 4px; font-size: 0.65rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em; color: var(--green-glow);
+    margin-left: 0.5rem;
+  }
+  select option { background: #141E18; }
+
+  /* Animations */
+  .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.6s, transform 0.6s; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* ===================== RESPONSIVE ===================== */
+  @media (max-width: 1100px) {
+    .content-sidebar-layout { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .newsletter-inner { grid-template-columns: 1fr; gap: 2rem; }
+  }
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    .featured-grid { grid-template-columns: 1fr; }
+    .article-card-featured img { height: 300px; }
+    .article-card-featured.span2 { grid-column: span 1; }
+    .articles-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .admin-sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+    .admin-sidebar.open { transform: translateX(0); }
+    .admin-content { margin-left: 0; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .article-hero-content { padding: 2rem; }
+  }
+  @media (max-width: 480px) {
+    .section { padding: 4rem 1.25rem; }
+    .hero-content { padding: 0 1.25rem; padding-top: 80px; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .newsletter-input-group { flex-direction: column; }
+    .newsletter-input-group input, .newsletter-input-group button { border-radius: 8px; border-right: 1px solid; border-bottom: none; }
+    .newsletter-input-group button { border-top: none; border-bottom: 1px solid var(--gold) !important; }
+  }
+</style>
+</head>
+<body data-theme="dark">
+
+<!-- ==================== NAVIGATION ==================== -->
+<nav id="nav" role="navigation" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo" onclick="showPage('home')" ondblclick="event.preventDefault();if(currentPage!=='admin-panel')showPage('admin-login')">
+      <svg class="logo-icon" viewBox="0 0 32 32" fill="none">
+        <path d="M16 3C9 3 4 9 4 16s5 13 12 13 12-6 12-13S23 3 16 3z" fill="none" stroke="#C8973A" stroke-width="1.5"/>
+        <path d="M16 6c-2 4-5 6-5 10 0 3.3 2.7 6 5 6s5-2.7 5-6c0-4-3-6-5-10z" fill="#C8973A" opacity="0.3"/>
+        <path d="M16 6c2 4 5 6 5 10 0 3.3-2.7 6-5 6V6z" fill="#C8973A" opacity="0.6"/>
+        <circle cx="16" cy="16" r="3" fill="#C8973A"/>
+      </svg>
+      WildJourney
+    </a>
+    <ul class="nav-links">
+      <li><a href="#" class="active" onclick="showPage('home'); setActiveNav(this)">Home</a></li>
+      <li><a href="#" onclick="filterCat('nature'); setActiveNav(this)">Nature</a></li>
+      <li><a href="#" onclick="filterCat('wildlife'); setActiveNav(this)">Wildlife</a></li>
+      <li><a href="#" onclick="filterCat('travel'); setActiveNav(this)">Travel</a></li>
+      <li><a href="#" onclick="filterCat('adventure'); setActiveNav(this)">Adventure</a></li>
+      <li><a href="#" onclick="filterCat('lifestyle'); setActiveNav(this)">Lifestyle</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="nav-search-btn" onclick="toggleSearch()" aria-label="Search">🔍</button>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme" id="theme-btn">🌙</button>
+    </div>
+    <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+      <span id="ham1"></span><span id="ham2"></span><span id="ham3"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#" onclick="showPage('home'); closeMobileMenu()">Home</a>
+  <a href="#" onclick="filterCat('nature'); closeMobileMenu()">Nature</a>
+  <a href="#" onclick="filterCat('wildlife'); closeMobileMenu()">Wildlife</a>
+  <a href="#" onclick="filterCat('travel'); closeMobileMenu()">Travel</a>
+  <a href="#" onclick="filterCat('adventure'); closeMobileMenu()">Adventure</a>
+  <a href="#" onclick="filterCat('lifestyle'); closeMobileMenu()">Lifestyle</a>
+</div>
+
+<!-- Search Overlay -->
+<div id="search-overlay" role="dialog" aria-label="Search">
+  <div class="search-box">
+    <div class="search-input-wrap">
+      <span>🔍</span>
+      <input type="text" id="search-input" placeholder="Search articles, destinations, wildlife..." autocomplete="off" oninput="handleSearch(this.value)">
+      <button class="search-close" onclick="toggleSearch()">✕</button>
+    </div>
+    <div class="search-results" id="search-results">
+      <div style="padding:1rem;font-size:0.85rem;color:var(--text-muted);text-align:center;">Start typing to search...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== HOME PAGE ==================== -->
+<div id="home-page">
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid-lines"></div>
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div class="hero-featured-img" id="hero-featured-img"></div>
+    <div class="hero-gradient-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <span class="eyebrow-dot"></span>
+        Discover the Wild World
+      </div>
+      <h1 class="hero-title">
+        Where <span class="accent">Nature</span><br>
+        Tells Its <span class="green-line">Stories</span>
+      </h1>
+      <p class="hero-subtitle">Premium journalism from the world's most extraordinary wild places. Breathtaking photography, expert storytelling, and adventures worth living.</p>
+      <div class="hero-cta">
+        <button class="btn-primary" onclick="scrollToArticles()">
+          Explore Articles
+          <span>→</span>
+        </button>
+        <button class="btn-secondary" onclick="scrollToNewsletter()">
+          <span>✉</span> Subscribe Free
+        </button>
+      </div>
+    </div>
+    <div class="hero-scroll-indicator" onclick="scrollToArticles()">
+      <span class="scroll-text">Scroll</span>
+      <span class="scroll-line"></span>
+    </div>
+  </section>
+
+  <!-- CATEGORIES BAR -->
+  <div id="categories-bar">
+    <div class="cats-inner">
+      <button class="cat-pill active" onclick="filterCat('all', this)">✦ All</button>
+      <button class="cat-pill" onclick="filterCat('nature', this)">🌿 Nature</button>
+      <button class="cat-pill" onclick="filterCat('wildlife', this)">🦁 Wildlife</button>
+      <button class="cat-pill" onclick="filterCat('travel', this)">🗺️ Travel</button>
+      <button class="cat-pill" onclick="filterCat('adventure', this)">⛰️ Adventure</button>
+      <button class="cat-pill" onclick="filterCat('lifestyle', this)">🌸 Lifestyle</button>
+      <button class="cat-pill" onclick="filterCat('conservation', this)">🌍 Conservation</button>
+      <button class="cat-pill" onclick="filterCat('photography', this)">📷 Photography</button>
+    </div>
+  </div>
+
+  <!-- FEATURED ARTICLES -->
+  <section class="section" id="articles-section">
+    <div class="section-inner">
+      <div class="section-header fade-in">
+        <div class="section-label">Featured</div>
+        <h2 class="section-title">Editor's Picks</h2>
+        <p class="section-subtitle">Hand-selected stories from our team of expert writers and photographers.</p>
+      </div>
+      <div class="featured-grid fade-in" id="featured-grid">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- TRENDING + SIDEBAR -->
+  <section class="section" style="padding-top:0">
+    <div class="section-inner">
+      <div class="content-sidebar-layout">
+        <!-- Trending -->
+        <div>
+          <div class="section-header fade-in">
+            <div class="section-label">Latest</div>
+            <h2 class="section-title">Recent Stories</h2>
+          </div>
+          <div class="articles-grid fade-in" id="articles-grid">
+            <!-- Populated by JS -->
+          </div>
+          <div style="text-align:center;margin-top:2.5rem;" class="fade-in">
+            <button class="btn-secondary" onclick="loadMoreArticles()" style="padding:0.875rem 2.5rem;">
+              Load More Stories
+            </button>
+          </div>
+        </div>
+        <!-- Sidebar -->
+        <div>
+          <!-- Ad -->
+          <div class="ad-placeholder" style="margin-bottom:1.5rem;">
+            <div class="ad-label">Advertisement</div>
+            <div style="font-size:2rem;opacity:0.3;">◻</div>
+            <div style="font-size:0.8rem;color:var(--text-muted);">Google AdSense 300×250</div>
+          </div>
+          <!-- Trending -->
+          <div class="sidebar-widget fade-in">
+            <h3>🔥 Trending Now</h3>
+            <div class="trending-list" id="trending-list">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+          <!-- Tags -->
+          <div class="sidebar-widget fade-in">
+            <h3>Popular Tags</h3>
+            <div class="tag-cloud">
+              <a href="#" class="tag" onclick="filterCat('safari')">Safari</a>
+              <a href="#" class="tag" onclick="filterCat('amazon')">Amazon</a>
+              <a href="#" class="tag" onclick="filterCat('arctic')">Arctic</a>
+              <a href="#" class="tag" onclick="filterCat('ocean')">Ocean</a>
+              <a href="#" class="tag" onclick="filterCat('birds')">Birds</a>
+              <a href="#" class="tag" onclick="filterCat('mountains')">Mountains</a>
+              <a href="#" class="tag" onclick="filterCat('big5')">Big 5</a>
+              <a href="#" class="tag" onclick="filterCat('coral')">Coral Reefs</a>
+              <a href="#" class="tag" onclick="filterCat('migration')">Migration</a>
+              <a href="#" class="tag" onclick="filterCat('rainforest')">Rainforest</a>
+            </div>
+          </div>
+          <!-- Newsletter mini -->
+          <div class="sidebar-widget fade-in" style="background:linear-gradient(135deg,var(--green-deep),#0F2A20);">
+            <h3 style="color:var(--cream)">📬 Newsletter</h3>
+            <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem;">Weekly stories from the wild delivered to your inbox.</p>
+            <input type="email" class="form-input" placeholder="your@email.com" style="margin-bottom:0.75rem;">
+            <button class="btn-full" onclick="showToast('Thanks!','You have been subscribed.','success')">Subscribe</button>
+          </div>
+          <!-- Affiliate -->
+          <div class="sidebar-widget fade-in">
+            <h3>🎒 Gear Picks</h3>
+            <div style="display:flex;flex-direction:column;gap:0.75rem;" id="affiliate-sidebar">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWSLETTER SECTION -->
+  <section id="newsletter">
+    <div class="newsletter-inner">
+      <div class="newsletter-text fade-in">
+        <div class="section-label">Stay Connected</div>
+        <h2>Never Miss a Wild Story</h2>
+        <p>Join 50,000+ nature lovers who get our weekly digest of breathtaking destinations, wildlife encounters, and conservation news. No spam, ever.</p>
+        <div style="display:flex;gap:2rem;margin-top:1.5rem;flex-wrap:wrap;">
+          <div style="text-align:center;"><div style="font-size:1.5rem;font-weight:700;color:var(--gold)">50K+</div><div style="font-size:0.75rem;color:var(--text-muted)">Subscribers</div></div>
+          <div style="text-align:center;"><div style="font-size:1.5rem;font-weight:700;color:var(--gold)">Weekly</div><div style="font-size:0.75rem;color:var(--text-muted)">Editions</div></div>
+          <div style="text-align:center;"><div style="font-size:1.5rem;font-weight:700;color:var(--gold)">Free</div><div style="font-size:0.75rem;color:var(--text-muted)">Always</div></div>
+        </div>
+      </div>
+      <div class="fade-in">
+        <div class="newsletter-form">
+          <div class="newsletter-input-group">
+            <input type="email" id="newsletter-email" placeholder="Enter your email address...">
+            <button onclick="subscribeNewsletter()">Subscribe →</button>
+          </div>
+          <p class="newsletter-note">🔒 Your privacy is protected. Unsubscribe anytime.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /home-page -->
+
+<!-- ==================== ARTICLE PAGE ==================== -->
+<div id="article-page">
+  <div class="article-hero" id="article-hero">
+    <img id="article-hero-img" src="" alt="" class="article-hero-img">
+    <div class="article-hero-overlay"></div>
+    <div class="article-hero-content">
+      <div class="article-page-cat" id="article-page-cat"></div>
+      <h1 class="article-page-title" id="article-page-title"></h1>
+      <div class="article-page-meta">
+        <span class="author" id="article-page-author"></span>
+        <span>·</span>
+        <span id="article-page-date"></span>
+        <span>·</span>
+        <span id="article-page-read"></span>
+        <span>·</span>
+        <span id="article-page-views"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="article-body-wrap">
+    <div class="article-share">
+      <span>Share this story</span>
+      <button class="share-btn" onclick="shareArticle('twitter')">𝕏 Twitter</button>
+      <button class="share-btn" onclick="shareArticle('facebook')">📘 Facebook</button>
+      <button class="share-btn" onclick="shareArticle('whatsapp')">💬 WhatsApp</button>
+      <button class="share-btn" onclick="copyLink()">🔗 Copy Link</button>
+    </div>
+
+    <!-- Ad -->
+    <div class="ad-placeholder" style="margin:2rem 0;">
+      <div class="ad-label">Advertisement</div>
+      <div style="font-size:0.8rem;color:var(--text-muted)">Google AdSense 728×90</div>
+    </div>
+
+    <div class="article-body" id="article-body"></div>
+
+    <div class="article-share" style="margin-top:2rem">
+      <span>Found this helpful?</span>
+      <button class="share-btn" onclick="shareArticle('twitter')">𝕏 Twitter</button>
+      <button class="share-btn" onclick="shareArticle('facebook')">📘 Facebook</button>
+      <button class="share-btn" onclick="copyLink()">🔗 Copy Link</button>
+    </div>
+
+    <div class="comments-section">
+      <h3>Comments</h3>
+      <div class="comment-form">
+        <textarea id="comment-text" placeholder="Share your thoughts..."></textarea>
+        <div style="display:flex;gap:0.75rem;margin-bottom:1.5rem;">
+          <input type="text" class="form-input" id="comment-name" placeholder="Your name" style="flex:1">
+          <button class="btn-primary" onclick="addComment()">Post Comment</button>
+        </div>
+      </div>
+      <div id="comments-list"></div>
+    </div>
+
+    <div style="margin-top:3rem;">
+      <button class="btn-secondary" onclick="showPage('home')">← Back to All Stories</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ADMIN LOGIN ==================== -->
+<div id="admin-login">
+  <div class="admin-login-wrap">
+    <div class="admin-login-card">
+      <div class="admin-login-logo">🌿 WildJourney</div>
+      <div class="admin-login-sub">Authorized Access Only</div>
+      <div id="lockout-banner" style="display:none;background:rgba(200,90,58,0.12);border:1px solid rgba(200,90,58,0.35);border-radius:8px;padding:0.75rem;font-size:0.8rem;color:#E07060;text-align:center;margin-bottom:1.25rem;">
+        🔒 Too many failed attempts. Try again in <span id="lockout-timer">30</span>s.
+      </div>
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <input type="text" class="form-input" id="admin-user" placeholder="Username" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="admin-pass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')adminLogin()">
+      </div>
+      <div id="attempts-warn" style="display:none;font-size:0.75rem;color:var(--gold);margin-bottom:0.75rem;text-align:center;"></div>
+      <button class="btn-full" id="login-btn" onclick="adminLogin()">Sign In Securely</button>
+      <div class="login-error" id="login-error">Invalid credentials. Please try again.</div>
+      <div style="text-align:center;margin-top:1.5rem;">
+        <button onclick="showPage('home')" style="background:none;border:none;color:var(--text-muted);font-size:0.8rem;cursor:pointer;">← Back to Website</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ADMIN PANEL ==================== -->
+<div id="admin-panel">
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="admin-sidebar">
+      <div class="admin-sidebar-logo">🌿 Admin</div>
+      <ul class="admin-nav">
+        <li class="nav-section-label">Overview</li>
+        <li><button class="active" onclick="showAdminSection('dashboard', this)"><span class="nav-icon">📊</span> Dashboard</button></li>
+        <li><button onclick="showAdminSection('analytics', this)"><span class="nav-icon">📈</span> Analytics</button></li>
+
+        <li class="nav-section-label">Content</li>
+        <li><button onclick="showAdminSection('articles', this)"><span class="nav-icon">📝</span> Articles</button></li>
+        <li><button onclick="showAdminSection('new-article', this)"><span class="nav-icon">✏️</span> New Article</button></li>
+        <li><button onclick="showAdminSection('ai-writer', this)"><span class="nav-icon">🤖</span> AI Writer <span class="badge-new">AI</span></button></li>
+        <li><button onclick="showAdminSection('categories', this)"><span class="nav-icon">🗂️</span> Categories</button></li>
+        <li><button onclick="showAdminSection('media', this)"><span class="nav-icon">🖼️</span> Media Library</button></li>
+        <li><button onclick="showAdminSection('comments', this)"><span class="nav-icon">💬</span> Comments</button></li>
+
+        <li class="nav-section-label">Monetization</li>
+        <li><button onclick="showAdminSection('adsense', this)"><span class="nav-icon">💰</span> AdSense</button></li>
+        <li><button onclick="showAdminSection('affiliate', this)"><span class="nav-icon">🔗</span> Affiliate</button></li>
+        <li><button onclick="showAdminSection('newsletter-mgr', this)"><span class="nav-icon">📬</span> Newsletter</button></li>
+
+        <li class="nav-section-label">Settings</li>
+        <li><button onclick="showAdminSection('seo', this)"><span class="nav-icon">🔍</span> SEO Settings</button></li>
+        <li><button onclick="showAdminSection('settings', this)"><span class="nav-icon">⚙️</span> Site Settings</button></li>
+        <li><button onclick="adminLogout()"><span class="nav-icon">🚪</span> Logout</button></li>
+      </ul>
+    </aside>
+
+    <!-- Content -->
+    <main class="admin-content">
+
+      <!-- Dashboard -->
+      <div id="section-dashboard" class="admin-panel-section active">
+        <div class="admin-header">
+          <h1>Dashboard</h1>
+          <button class="btn-primary" onclick="showAdminSection('new-article')">+ New Article</button>
+        </div>
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat-card"><div class="stat-label">Total Articles</div><div class="stat-value" id="stat-articles">0</div><div class="stat-change up">↑ 12% this month</div></div>
+          <div class="stat-card"><div class="stat-label">Total Views</div><div class="stat-value" id="stat-views">0</div><div class="stat-change up">↑ 24% this week</div></div>
+          <div class="stat-card"><div class="stat-label">Subscribers</div><div class="stat-value" id="stat-subs">0</div><div class="stat-change up">↑ 8% this month</div></div>
+          <div class="stat-card"><div class="stat-label">Est. Revenue</div><div class="stat-value" id="stat-rev">$0</div><div class="stat-change up">↑ 18% this month</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;">
+          <div class="chart-area">
+            <div class="chart-header">
+              <span class="chart-title">Page Views — Last 30 Days</span>
+              <span style="font-size:0.75rem;color:var(--text-muted)">Daily</span>
+            </div>
+            <div class="mini-bar-chart" id="views-chart"></div>
+            <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-muted);margin-top:0.5rem;">
+              <span>30d ago</span><span>Today</span>
+            </div>
+          </div>
+          <div class="chart-area">
+            <div class="chart-header"><span class="chart-title">Traffic Sources</span></div>
+            <div style="display:flex;flex-direction:column;gap:0.75rem;" id="traffic-sources"></div>
+          </div>
+        </div>
+        <div style="margin-top:1.5rem;">
+          <div class="chart-header" style="margin-bottom:1rem;"><span style="font-size:1rem;font-weight:600;color:var(--text-primary)">Recent Articles</span></div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead><tr><th>Title</th><th>Category</th><th>Views</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+              <tbody id="dashboard-articles-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analytics -->
+      <div id="section-analytics" class="admin-panel-section">
+        <div class="admin-header"><h1>Analytics</h1></div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">Monthly Visitors</div><div class="stat-value">12,847</div><div class="stat-change up">↑ 31%</div></div>
+          <div class="stat-card"><div class="stat-label">Avg. Session</div><div class="stat-value">3:42</div><div class="stat-change up">↑ 12%</div></div>
+          <div class="stat-card"><div class="stat-label">Bounce Rate</div><div class="stat-value">38%</div><div class="stat-change up">↓ 5%</div></div>
+          <div class="stat-card"><div class="stat-label">Pages/Session</div><div class="stat-value">4.2</div><div class="stat-change up">↑ 8%</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1.5rem;">
+          <div class="chart-area">
+            <div class="chart-header"><span class="chart-title">Top Countries</span></div>
+            <div style="display:flex;flex-direction:column;gap:0.75rem;" id="top-countries"></div>
+          </div>
+          <div class="chart-area">
+            <div class="chart-header"><span class="chart-title">Devices</span></div>
+            <div style="display:flex;flex-direction:column;gap:0.75rem;" id="device-stats"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Articles Manager -->
+      <div id="section-articles" class="admin-panel-section">
+        <div class="admin-header">
+          <h1>All Articles</h1>
+          <button class="btn-primary" onclick="showAdminSection('new-article')">+ New Article</button>
+        </div>
+        <div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+          <input type="text" class="form-input" placeholder="Search articles..." id="articles-search" oninput="filterAdminArticles(this.value)" style="flex:1;min-width:200px;">
+          <select class="form-select" onchange="filterAdminArticlesCat(this.value)" style="width:180px;">
+            <option value="all">All Categories</option>
+            <option value="nature">Nature</option>
+            <option value="wildlife">Wildlife</option>
+            <option value="travel">Travel</option>
+            <option value="adventure">Adventure</option>
+            <option value="lifestyle">Lifestyle</option>
+          </select>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Title</th><th>Category</th><th>Author</th><th>Views</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="full-articles-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- New Article -->
+      <div id="section-new-article" class="admin-panel-section">
+        <div class="admin-header">
+          <h1 id="article-editor-title">New Article</h1>
+        </div>
+        <div class="editor-form">
+          <div class="form-row" style="margin-bottom:1.25rem;">
+            <div class="form-group" style="grid-column:span 2">
+              <label class="form-label">Article Title *</label>
+              <input type="text" class="form-input" id="edit-title" placeholder="Enter a compelling headline..." style="font-size:1rem;">
+            </div>
+          </div>
+          <div class="form-row" style="margin-bottom:1.25rem;">
+            <div class="form-group">
+              <label class="form-label">Category *</label>
+              <select class="form-select" id="edit-category">
+                <option value="nature">Nature</option>
+                <option value="wildlife">Wildlife</option>
+                <option value="travel">Travel</option>
+                <option value="adventure">Adventure</option>
+                <option value="lifestyle">Lifestyle</option>
+                <option value="conservation">Conservation</option>
+                <option value="photography">Photography</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Author Name *</label>
+              <input type="text" class="form-input" id="edit-author" placeholder="Jane Smith">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:1.25rem;">
+            <label class="form-label">Excerpt (for cards)</label>
+            <textarea class="form-textarea" id="edit-excerpt" style="min-height:80px;" placeholder="A short compelling summary for article cards and SEO..."></textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:1.25rem;">
+            <label class="form-label">Article Body *</label>
+            <div class="editor-toolbar">
+              <button class="toolbar-btn" onclick="insertTag('h2')">H2</button>
+              <button class="toolbar-btn" onclick="insertTag('b')"><b>B</b></button>
+              <button class="toolbar-btn" onclick="insertTag('i')"><i>I</i></button>
+              <button class="toolbar-btn" onclick="insertTag('blockquote')">❝ Quote</button>
+              <button class="toolbar-btn" onclick="insertTag('p')">¶ Para</button>
+            </div>
+            <textarea class="form-textarea" id="edit-body" placeholder="Write your article content here. Use HTML tags for formatting: &lt;h2&gt;, &lt;p&gt;, &lt;blockquote&gt;, &lt;b&gt;, &lt;i&gt;..."></textarea>
+          </div>
+          <div class="form-row" style="margin-bottom:1.25rem;">
+            <div class="form-group">
+              <label class="form-label">Cover Image URL</label>
+              <input type="text" class="form-input" id="edit-image" placeholder="https://example.com/image.jpg">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tags (comma separated)</label>
+              <input type="text" class="form-input" id="edit-tags" placeholder="safari, africa, wildlife">
+            </div>
+          </div>
+          <div class="form-row" style="margin-bottom:1.25rem;">
+            <div class="form-group">
+              <label class="form-label">Meta Description (SEO)</label>
+              <input type="text" class="form-input" id="edit-meta" placeholder="160 character description for search engines...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select class="form-select" id="edit-status">
+                <option value="published">Published</option>
+                <option value="draft">Draft</option>
+              </select>
+            </div>
+          </div>
+          <!-- SEO score -->
+          <div class="seo-score" style="margin-bottom:1.5rem;">
+            <div class="seo-score-circle good" id="seo-circle">72</div>
+            <div>
+              <div style="font-size:0.85rem;font-weight:600;color:var(--text-primary)">SEO Score</div>
+              <div style="font-size:0.75rem;color:var(--text-muted)">Add meta description and tags to improve score</div>
+            </div>
+          </div>
+          <input type="hidden" id="edit-id" value="">
+          <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+            <button class="btn-primary" onclick="saveArticle()">💾 Save Article</button>
+            <button class="btn-secondary" onclick="previewArticle()">👁 Preview</button>
+            <button class="btn-secondary" onclick="clearEditor()">✕ Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Writer -->
+      <div id="section-ai-writer" class="admin-panel-section">
+        <div class="admin-header"><h1>AI Article Generator</h1><span class="badge-new">Powered by Claude</span></div>
+        <div class="ai-prompt-area">
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label">Article Topic or Prompt</label>
+            <textarea class="form-textarea" id="ai-prompt" style="min-height:120px;" placeholder="E.g. 'Write a 1000-word article about the migration of wildebeest across the Serengeti, including vivid descriptions and key facts...'"></textarea>
+          </div>
+          <div class="form-row" style="margin-bottom:1rem;">
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select class="form-select" id="ai-category">
+                <option value="wildlife">Wildlife</option>
+                <option value="nature">Nature</option>
+                <option value="travel">Travel</option>
+                <option value="adventure">Adventure</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tone</label>
+              <select class="form-select" id="ai-tone">
+                <option>Journalistic</option>
+                <option>Educational</option>
+                <option>Inspiring</option>
+                <option>Conversational</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-primary" onclick="generateAIArticle()" style="margin-bottom:1.5rem;">🤖 Generate Article</button>
+          <div class="ai-loading" id="ai-loading">
+            <div class="ai-dots"><span></span><span></span><span></span></div>
+            <span style="font-size:0.85rem;color:var(--text-secondary)">Claude is writing your article...</span>
+          </div>
+          <div id="ai-output" style="display:none;">
+            <div class="divider"></div>
+            <h3 style="font-family:'Playfair Display',serif;font-size:1.25rem;margin-bottom:1rem;color:var(--text-primary)">Generated Article</h3>
+            <div class="form-textarea" id="ai-result" style="min-height:300px;white-space:pre-wrap;overflow-y:auto;font-size:0.875rem;"></div>
+            <div style="display:flex;gap:1rem;margin-top:1rem;">
+              <button class="btn-primary" onclick="useAIArticle()">Use This Article →</button>
+              <button class="btn-secondary" onclick="regenerateAI()">↻ Regenerate</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Categories Manager -->
+      <div id="section-categories" class="admin-panel-section">
+        <div class="admin-header"><h1>Categories</h1></div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Category</th><th>Slug</th><th>Articles</th><th>Actions</th></tr></thead>
+            <tbody id="categories-table"></tbody>
+          </table>
+        </div>
+        <div style="margin-top:1.5rem;background:var(--dark-card);border:1px solid var(--dark-border);border-radius:12px;padding:1.5rem;">
+          <h3 style="font-size:1rem;font-weight:600;color:var(--text-primary);margin-bottom:1rem;">Add New Category</h3>
+          <div class="form-row">
+            <input type="text" class="form-input" id="new-cat-name" placeholder="Category name">
+            <button class="btn-primary" onclick="addCategory()">Add Category</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Media Library -->
+      <div id="section-media" class="admin-panel-section">
+        <div class="admin-header"><h1>Media Library</h1></div>
+        <div class="upload-zone" onclick="document.getElementById('file-input').click()" style="margin-bottom:1.5rem;">
+          <div class="upload-zone-icon">📂</div>
+          <p><strong>Click to upload</strong> or drag and drop</p>
+          <p style="font-size:0.75rem;margin-top:0.25rem;">JPG, PNG, WebP up to 10MB</p>
+        </div>
+        <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleFileUpload(this)">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;" id="media-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Comments -->
+      <div id="section-comments" class="admin-panel-section">
+        <div class="admin-header"><h1>Comments</h1></div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Author</th><th>Comment</th><th>Article</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="comments-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- AdSense -->
+      <div id="section-adsense" class="admin-panel-section">
+        <div class="admin-header"><h1>Google AdSense</h1></div>
+        <div class="editor-form" style="max-width:700px">
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label">AdSense Publisher ID</label>
+            <input type="text" class="form-input" id="adsense-id" placeholder="ca-pub-XXXXXXXXXXXXXXXX" value="ca-pub-0000000000000000">
+          </div>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label">Header Ad Slot ID</label>
+            <input type="text" class="form-input" placeholder="1234567890">
+          </div>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label">Sidebar Ad Slot ID</label>
+            <input type="text" class="form-input" placeholder="0987654321">
+          </div>
+          <div class="form-group" style="margin-bottom:1.5rem;">
+            <label class="form-label">In-Article Ad Slot ID</label>
+            <input type="text" class="form-input" placeholder="1122334455">
+          </div>
+          <button class="btn-primary" onclick="saveAdsense()">Save AdSense Settings</button>
+        </div>
+      </div>
+
+      <!-- Affiliate -->
+      <div id="section-affiliate" class="admin-panel-section">
+        <div class="admin-header"><h1>Affiliate Marketing</h1></div>
+        <div class="editor-form" style="margin-bottom:1.5rem;">
+          <h3 style="font-size:1rem;font-weight:600;margin-bottom:1rem;color:var(--text-primary)">Add Affiliate Product</h3>
+          <div class="form-row" style="margin-bottom:1rem;">
+            <div class="form-group">
+              <label class="form-label">Product Name</label>
+              <input type="text" class="form-input" id="aff-name" placeholder="National Geographic Camera Bag">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Affiliate Link</label>
+              <input type="text" class="form-input" id="aff-link" placeholder="https://amazon.com/...">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Commission</label>
+              <input type="text" class="form-input" id="aff-commission" placeholder="4%">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Image URL</label>
+              <input type="text" class="form-input" id="aff-img" placeholder="https://...">
+            </div>
+          </div>
+          <button class="btn-primary" style="margin-top:1rem;" onclick="addAffiliate()">Add Product</button>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Product</th><th>Commission</th><th>Clicks</th><th>Conversions</th><th>Actions</th></tr></thead>
+            <tbody id="affiliate-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Newsletter Manager -->
+      <div id="section-newsletter-mgr" class="admin-panel-section">
+        <div class="admin-header"><h1>Newsletter</h1></div>
+        <div class="stats-grid" style="max-width:600px;margin-bottom:2rem;">
+          <div class="stat-card"><div class="stat-label">Subscribers</div><div class="stat-value" id="nl-subs">0</div></div>
+          <div class="stat-card"><div class="stat-label">Open Rate</div><div class="stat-value">42%</div></div>
+        </div>
+        <div class="editor-form">
+          <h3 style="font-size:1rem;font-weight:600;margin-bottom:1rem;color:var(--text-primary)">Send Newsletter</h3>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label">Subject</label>
+            <input type="text" class="form-input" placeholder="This Week in the Wild 🌿">
+          </div>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label">Content</label>
+            <textarea class="form-textarea" style="min-height:200px;" placeholder="Newsletter body..."></textarea>
+          </div>
+          <button class="btn-primary" onclick="showToast('Newsletter Queued','Your newsletter has been scheduled for delivery.','success')">Send Newsletter →</button>
+        </div>
+      </div>
+
+      <!-- SEO -->
+      <div id="section-seo" class="admin-panel-section">
+        <div class="admin-header"><h1>SEO Settings</h1></div>
+        <div class="editor-form" style="max-width:700px;">
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label">Site Title</label>
+            <input type="text" class="form-input" value="WildJourney — Explore the World's Wild Places">
+          </div>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label">Meta Description</label>
+            <textarea class="form-textarea" style="min-height:80px;">Premium nature, wildlife, travel and adventure articles. Discover the world's most breathtaking destinations.</textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label">Focus Keywords</label>
+            <input type="text" class="form-input" value="nature, travel, wildlife, adventure, outdoor, exploration">
+          </div>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label">Google Analytics ID</label>
+            <input type="text" class="form-input" placeholder="G-XXXXXXXXXX">
+          </div>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label">Google Search Console Verification</label>
+            <input type="text" class="form-input" placeholder="Verification code...">
+          </div>
+          <div class="form-group" style="margin-bottom:1.5rem;">
+            <label class="form-label">Sitemap URL</label>
+            <input type="text" class="form-input" value="https://wildjourney.com/sitemap.xml">
+          </div>
+          <button class="btn-primary" onclick="showToast('SEO Saved','SEO settings updated successfully.','success')">Save SEO Settings</button>
+        </div>
+      </div>
+
+      <!-- Site Settings -->
+      <div id="section-settings" class="admin-panel-section">
+        <div class="admin-header"><h1>Site Settings</h1></div>
+        <div class="editor-form" style="max-width:700px;">
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label">Site Name</label>
+            <input type="text" class="form-input" value="WildJourney">
+          </div>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label">Tagline</label>
+            <input type="text" class="form-input" value="Explore the World's Wild Places">
+          </div>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label">Contact Email</label>
+            <input type="email" class="form-input" placeholder="hello@wildjourney.com">
+          </div>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label">Social — Instagram</label>
+            <input type="text" class="form-input" placeholder="@wildjourney">
+          </div>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label">Social — Twitter/X</label>
+            <input type="text" class="form-input" placeholder="@wildjourney">
+          </div>
+          <div class="form-group" style="margin-bottom:1.5rem;">
+            <label class="form-label">Change Admin Password</label>
+            <input type="password" class="form-input" id="new-admin-pass" placeholder="New password">
+          </div>
+          <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<footer id="main-footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="footer-logo">🌿 WildJourney</span>
+        <p class="footer-tagline">Bringing you the world's most breathtaking nature stories, wildlife encounters, and adventure journeys from every corner of the globe. Inspiring the next generation of explorers.</p>
+        <div class="social-links">
+          <a class="social-link" href="#" title="Instagram">📸</a>
+          <a class="social-link" href="#" title="Twitter">𝕏</a>
+          <a class="social-link" href="#" title="Facebook">📘</a>
+          <a class="social-link" href="#" title="YouTube">▶</a>
+          <a class="social-link" href="#" title="Pinterest">📌</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul class="footer-links">
+          <li><a href="#" onclick="filterCat('nature')">Nature</a></li>
+          <li><a href="#" onclick="filterCat('wildlife')">Wildlife</a></li>
+          <li><a href="#" onclick="filterCat('travel')">Travel</a></li>
+          <li><a href="#" onclick="filterCat('adventure')">Adventure</a></li>
+          <li><a href="#" onclick="filterCat('lifestyle')">Lifestyle</a></li>
+          <li><a href="#" onclick="filterCat('conservation')">Conservation</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul class="footer-links">
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Our Writers</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Advertise</a></li>
+          <li><a href="#">Partnerships</a></li>
+          <li><a href="#">Press</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul class="footer-links">
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Use</a></li>
+          <li><a href="#">Cookie Policy</a></li>
+          <li><a href="#">DMCA</a></li>
+          <li><a href="#">Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 WildJourney. All rights reserved. Crafted for the wild at heart.</span>
+      <div class="footer-legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Toast Notification -->
+<div id="toast">
+  <div class="toast-title" id="toast-title"></div>
+  <div class="toast-msg" id="toast-msg"></div>
+</div>
+
+<!-- ==================== SCRIPTS ==================== -->
+<script>
+// ============================================================
+// DATA STORE (localStorage for persistence without backend)
+// ============================================================
+const DB = {
+  get: (key, def) => { try { const v = localStorage.getItem('wj_'+key); return v ? JSON.parse(v) : def; } catch { return def; } },
+  set: (key, val) => { try { localStorage.setItem('wj_'+key, JSON.stringify(val)); } catch {} },
+};
+
+// ============================================================
+// SAMPLE ARTICLES DATA
+// ============================================================
+const SAMPLE_ARTICLES = [
+  { id: 1, title: "The Last Migration: Wildebeest Crossing the Mara River", category: "wildlife", author: "Sarah Chen", date: "2026-05-10", views: 12847, status: "published", excerpt: "Witness the most spectacular wildlife event on Earth — millions of wildebeest braving crocodile-infested waters in their eternal quest for greener pastures.", image: "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=1200&q=80", tags: "safari,africa,migration,wildlife", meta: "The Great Wildebeest Migration across the Serengeti and Masai Mara.", body: `<h2>Dawn Over the Mara</h2><p>The first light of dawn paints the savanna in shades of amber and rose as a sound like distant thunder begins to build. It grows — not thunder, but the rumble of hooves. Thousands of hooves. Then millions.</p><p>The Great Wildebeest Migration is underway.</p><blockquote>"In 35 years of wildlife photography, nothing has prepared me for the sheer scale of this moment," says renowned photographer James Oduya, his voice barely above a whisper. "It's not just an animal migration — it's the heartbeat of an entire continent."</blockquote><h2>The Numbers That Define an Epic</h2><p>Every year, approximately 1.5 million wildebeest, joined by 200,000 zebras and 500,000 gazelles, undertake a circular journey of some 1,800 kilometres across the Serengeti-Mara ecosystem. They follow the rains, and the rains follow their own ancient rhythm — a rhythm older than human civilization.</p><p>The Mara River crossing is the migration's most dramatic chapter. Here, the animals must brave one of Africa's most treacherous waterways, patrolled by massive Nile crocodiles that can reach lengths of five metres and weigh over 700 kilograms.</p><h2>Nature's Ultimate Gamble</h2><p>Standing at the riverbank, watching tens of thousands of wildebeest mill nervously at the water's edge, you understand why naturalists call this "nature's greatest gamble." The animals sense danger — they can smell the crocodiles — yet the imperative to cross is hardwired into their DNA.</p><p>Then one animal steps forward. And the dam breaks. In seconds, thousands are plunging into the churning brown water, a chaotic, magnificent torrent of muscle and instinct and pure survival drive.</p>` },
+  { id: 2, title: "Into the Amazon: A Journey to Earth's Green Heart", category: "nature", author: "Marco Rivera", date: "2026-05-08", views: 9231, status: "published", excerpt: "Deep in the world's largest rainforest, ancient trees hold secrets that could change everything we know about life on Earth.", image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80", tags: "amazon,rainforest,nature,brazil", meta: "Exploring the Amazon rainforest and its incredible biodiversity.", body: `<h2>The Green Cathedral</h2><p>To enter the Amazon is to step inside a living cathedral — one built over 55 million years, with columns of ironwood reaching 50 metres into the sky and a canopy that filters sunlight into a perpetual green twilight.</p><p>Our team of four spent three weeks deep in the Brazilian state of Amazonas, far beyond the reach of roads, guided by members of the Matsés people who have called this place home for centuries. What we found exceeded every expectation.</p><h2>A World Within a World</h2><p>Scientists estimate the Amazon harbors 10% of all species on Earth, yet we have catalogued fewer than 20% of them. New species are still being discovered at a remarkable rate — an average of one new species every two days over the past decade.</p><blockquote>"The Amazon is not a place we are discovering," our Matsés guide Shapu told us on our fourth day. "It is a place that is discovering us."</blockquote>` },
+  { id: 3, title: "Arctic Silence: Polar Bears on Thin Ice", category: "wildlife", author: "Dr. Elena Frost", date: "2026-05-05", views: 15620, status: "published", excerpt: "Climate change is reshaping the Arctic faster than any model predicted. The polar bear's story is becoming a race against time.", image: "https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=1200&q=80", tags: "arctic,polar bears,climate,wildlife", meta: "Polar bear conservation and climate change in the Arctic.", body: `<h2>The Patience of Predators</h2><p>A polar bear can wait. For hours, sometimes days, absolutely motionless beside a seal's breathing hole in the sea ice — a white statue in a white landscape, patient as stone. This extraordinary stillness is one of evolution's great achievements.</p><p>But the platform the bears wait upon is vanishing. Arctic sea ice is declining at approximately 13% per decade, according to NASA satellite data, and the trend is accelerating.</p><h2>Scientists in the Field</h2><p>Dr. Kristin Laidre of the University of Washington has been tracking polar bear populations for two decades. Standing on the Churchill tundra as a bear ambled past just 200 metres away, she shared observations that are both scientifically rigorous and deeply personal.</p><blockquote>"In 2004, we were still debating whether this was a crisis. That debate is over. The question now is how many we can save, and for how long."</blockquote>` },
+  { id: 4, title: "Dawn Chorus: Britain's Most Magical Morning Sound", category: "nature", author: "Oliver Hughes", date: "2026-05-03", views: 4560, status: "published", excerpt: "Every spring morning, Britain's woodlands erupt into the most complex symphony on Earth — if you know how to listen.", image: "https://images.unsplash.com/photo-1444464666168-49d633b86797?w=1200&q=80", tags: "birds,uk,nature,sound", meta: "The dawn chorus in British woodlands — a guide to nature's morning symphony.", body: `<h2>5:17 AM</h2><p>The blackbird always begins first. A single, liquid phrase, repeated three times with variations — as if testing the acoustics, warming up for a performance it has rehearsed ten thousand times in its brief life. Then silence. Then the robin joins in, its melody somehow simultaneously melancholic and defiant.</p><p>Within twenty minutes, you cannot distinguish individual voices. The woodland has become a single roaring instrument, and you're standing inside it.</p>` },
+  { id: 5, title: "Chasing Monsoon: Motorcycle Through India's West Coast", category: "adventure", author: "Priya Sharma", date: "2026-05-01", views: 7834, status: "published", excerpt: "2,000 kilometers on a Royal Enfield through Kerala and Karnataka during the world's most dramatic weather event.", image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80", tags: "india,motorcycle,monsoon,adventure", meta: "Motorcycle adventure through India's west coast during monsoon season.", body: `<h2>The Road to Nowhere Perfect</h2><p>The Royal Enfield Himalayan has a single-cylinder engine that sounds like someone rhythmically thumping a bass drum. After two weeks of riding, you stop hearing it consciously — it becomes your heartbeat, the pulse of a journey that started with a simple, slightly reckless idea.</p><p>I wanted to ride the monsoon. Not escape it, not photograph it from a hotel balcony — ride through it, into it, with it.</p>` },
+  { id: 6, title: "The Secret Life of Coral Reefs at Night", category: "wildlife", author: "Dr. Maya Patel", date: "2026-04-28", views: 8920, status: "published", excerpt: "What happens beneath the waves after sunset? Marine biologists reveal a world of bioluminescence, predation, and surprising beauty.", image: "https://images.unsplash.com/photo-1546026423-cc4642628d2b?w=1200&q=80", tags: "ocean,coral,marine,diving", meta: "Coral reef life at night — bioluminescence and nocturnal marine species.", body: `<h2>Entering the Night Ocean</h2><p>Sliding beneath the surface at 9 PM, torch switched off, is an act of deliberate sensory surrender. For a few seconds, you are blind in the warm, salt-heavy water. Then your eyes adjust, and the reef begins to reveal itself in ways no daytime dive ever shows.</p><p>Phosphorescence trails your hands as you move. Parrotfish sleep in mucus cocoons they secrete each evening — a biological sleeping bag that masks their scent from predators. Octopuses, daytime hiders, flow across the coral with boneless confidence.</p>` },
+  { id: 7, title: "Reindeer Herders of the Arctic Tundra", category: "lifestyle", author: "Ingrid Larsen", date: "2026-04-25", views: 5270, status: "published", excerpt: "The Sámi people of northern Scandinavia maintain a way of life unchanged for millennia — but for how long?", image: "https://images.unsplash.com/photo-1518623489648-a173ef7824f3?w=1200&q=80", tags: "sami,arctic,culture,lifestyle", meta: "Sámi reindeer herding culture in Arctic Scandinavia.", body: `<h2>Reading Snow</h2><p>Anders Eira knows twelve different words for snow in Northern Sámi, and he can tell you — from thirty metres away, at a glance — what type of crust is beneath the white surface, how deep the ice layer goes, and whether the reindeer can reach the lichen beneath it.</p><p>This is knowledge accumulated over 400 years in his family. Knowledge that cannot be Googled.</p>` },
+  { id: 8, title: "Cloud Forests of Ecuador: Walking in the Mist", category: "travel", author: "Carlos Mendez", date: "2026-04-22", views: 6140, status: "published", excerpt: "At 2,000 metres above sea level, Ecuador's cloud forests are among the most biodiverse places on the planet — and the most mysterious.", image: "https://images.unsplash.com/photo-1448375240586-882707db888b?w=1200&q=80", tags: "ecuador,cloud forest,travel,biodiversity", meta: "Exploring Ecuador's cloud forests — biodiversity and travel guide.", body: `<h2>The Permanent Cloud</h2><p>The cloud forest is never not mysterious. By definition, it lives in cloud — tendrils of mist that move through the canopy with the unhurried certainty of something that knows it belongs. Trees wear epiphytes like elaborate green coats. Every branch hosts a garden.</p>` },
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let articles = DB.get('articles', SAMPLE_ARTICLES);
+let affiliates = DB.get('affiliates', [
+  { id: 1, name: "Vanguard Binoculars 10x42", link: "#", commission: "5%", clicks: 234, conversions: 12 },
+  { id: 2, name: "ExOfficio Nylon Pants", link: "#", commission: "8%", clicks: 189, conversions: 8 },
+  { id: 3, name: "Osprey Atmos 65 Pack", link: "#", commission: "6%", clicks: 311, conversions: 21 },
+]);
+let categories = DB.get('categories', ['Nature','Wildlife','Travel','Adventure','Lifestyle','Conservation','Photography']);
+let subscribers = DB.get('subscribers', []);
+let adminPass = DB.get('admin_pass', 'admin123');
+let currentFilter = 'all';
+let editingArticleId = null;
+let currentPage = 'home';
+let articlesPerPage = 6;
+let displayedCount = 6;
+
+// ============================================================
+// NAVIGATION / PAGE SWITCHING
+// ============================================================
+function showPage(page) {
+  document.getElementById('home-page').style.display = 'none';
+  document.getElementById('article-page').style.display = 'none';
+  document.getElementById('admin-login').style.display = 'none';
+  document.getElementById('admin-panel').style.display = 'none';
+  document.getElementById('main-footer').style.display = 'none';
+
+  if (page === 'home') {
+    document.getElementById('home-page').style.display = 'block';
+    document.getElementById('main-footer').style.display = 'block';
+    document.getElementById('nav').style.display = 'block';
+    window.scrollTo(0,0);
+  } else if (page === 'article') {
+    document.getElementById('article-page').style.display = 'block';
+    document.getElementById('main-footer').style.display = 'block';
+    document.getElementById('nav').style.display = 'block';
+    window.scrollTo(0,0);
+  } else if (page === 'admin-login') {
+    document.getElementById('admin-login').style.display = 'block';
+    document.getElementById('nav').style.display = 'none';
+  } else if (page === 'admin-panel') {
+    document.getElementById('admin-panel').style.display = 'block';
+    document.getElementById('nav').style.display = 'none';
+    initAdminPanel();
+  }
+  currentPage = page;
+}
+
+function setActiveNav(el) {
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  el.classList.add('active');
+  showPage('home');
+}
+
+// ============================================================
+// NAVBAR SCROLL
+// ============================================================
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('nav');
+  nav.classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// ============================================================
+// THEME TOGGLE
+// ============================================================
+function toggleTheme() {
+  const body = document.body;
+  const isDark = body.getAttribute('data-theme') === 'dark';
+  body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('theme-btn').textContent = isDark ? '🌿' : '🌙';
+}
+
+// ============================================================
+// MOBILE MENU
+// ============================================================
+function toggleMobileMenu() {
+  document.getElementById('mobile-menu').classList.toggle('open');
+}
+function closeMobileMenu() {
+  document.getElementById('mobile-menu').classList.remove('open');
+}
+
+// ============================================================
+// SEARCH
+// ============================================================
+function toggleSearch() {
+  const ov = document.getElementById('search-overlay');
+  ov.classList.toggle('open');
+  if (ov.classList.contains('open')) { document.getElementById('search-input').focus(); document.getElementById('search-input').value = ''; document.getElementById('search-results').innerHTML = '<div style="padding:1rem;font-size:0.85rem;color:var(--text-muted);text-align:center">Start typing to search...</div>'; }
+}
+function handleSearch(q) {
+  const res = document.getElementById('search-results');
+  if (!q.trim()) { res.innerHTML = '<div style="padding:1rem;font-size:0.85rem;color:var(--text-muted);text-align:center">Start typing to search...</div>'; return; }
+  const matches = articles.filter(a => a.title.toLowerCase().includes(q.toLowerCase()) || a.excerpt.toLowerCase().includes(q.toLowerCase()) || a.category.toLowerCase().includes(q.toLowerCase()));
+  if (!matches.length) { res.innerHTML = '<div style="padding:1rem;font-size:0.85rem;color:var(--text-muted);text-align:center">No results found.</div>'; return; }
+  res.innerHTML = matches.slice(0,5).map(a => `
+    <div class="search-result-item" onclick="openArticle(${a.id});toggleSearch()">
+      <img class="search-result-img" src="${a.image}" alt="">
+      <div class="search-result-text"><h4>${a.title}</h4><p>${a.category} · ${a.author}</p></div>
+    </div>`).join('');
+}
+// ============================================================
+// SECRET ADMIN ACCESS — Ctrl+Shift+Z (invisible to public)
+// ============================================================
+let _keySeq = [];
+const SECRET_COMBO = ['Control','Shift','Z'];
+document.addEventListener('keydown', e => {
+  // Escape closes search
+  if (e.key === 'Escape') {
+    if (document.getElementById('search-overlay').classList.contains('open')) toggleSearch();
+    return;
+  }
+  // Secret combo tracker
+  _keySeq.push(e.key);
+  _keySeq = _keySeq.slice(-3);
+  if (_keySeq.join(',') === SECRET_COMBO.join(',')) {
+    if (currentPage !== 'admin-panel') showPage('admin-login');
+  }
+});
+
+// ============================================================
+// ARTICLES RENDERING
+// ============================================================
+function getFilteredArticles() {
+  return articles.filter(a => a.status === 'published' && (currentFilter === 'all' || a.category === currentFilter || (a.tags && a.tags.includes(currentFilter))));
+}
+
+function renderFeaturedGrid() {
+  const pub = articles.filter(a => a.status === 'published');
+  if (!pub.length) return;
+  const top = pub.slice(0, 3);
+  const grid = document.getElementById('featured-grid');
+  grid.innerHTML = top.map((a, i) => `
+    <div class="article-card-featured ${i === 0 ? 'span2' : 'small'}" onclick="openArticle(${a.id})">
+      <img src="${a.image}" alt="${a.title}" loading="lazy">
+      <div class="article-card-overlay"></div>
+      <div class="article-card-body">
+        <div><span class="article-cat-badge ${a.category}">${a.category}</span></div>
+        <div class="article-card-title">${a.title}</div>
+        <div class="article-meta">
+          <span>${a.author}</span><span class="article-meta-sep"></span>
+          <span>${formatDate(a.date)}</span><span class="article-meta-sep"></span>
+          <span>${calcReadTime(a.body)} min read</span>
+        </div>
+        <div class="read-more-arrow">Read Story <span>→</span></div>
+      </div>
+    </div>`).join('');
+
+  // Hero bg from first article
+  const heroImg = document.getElementById('hero-featured-img');
+  if (top[0]) { heroImg.style.backgroundImage = `url('${top[0].image}')`; setTimeout(() => heroImg.classList.add('loaded'), 100); }
+}
+
+function renderArticlesGrid(reset) {
+  if (reset) displayedCount = articlesPerPage;
+  const filtered = getFilteredArticles();
+  const toShow = filtered.slice(0, displayedCount);
+  const grid = document.getElementById('articles-grid');
+  grid.innerHTML = toShow.map(a => `
+    <article class="article-card" onclick="openArticle(${a.id})">
+      <div class="article-card-img-wrap">
+        <img src="${a.image}" alt="${a.title}" loading="lazy">
+        <span class="article-cat-badge ${a.category}" style="position:absolute;top:1rem;left:1rem;">${a.category}</span>
+      </div>
+      <div class="article-card-content">
+        <h3 class="article-card-title-sm">${a.title}</h3>
+        <p class="article-excerpt">${a.excerpt}</p>
+        <div class="article-footer-meta">
+          <div class="author-mini">
+            <div class="author-avatar">${a.author.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)}</div>
+            <span>${a.author}</span>
+          </div>
+          <div class="read-time">⏱ ${calcReadTime(a.body)} min</div>
+        </div>
+      </div>
+    </article>`).join('');
+  if (!toShow.length) grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted)">No articles found in this category yet.</div>';
+}
+
+function renderTrending() {
+  const sorted = [...articles].filter(a=>a.status==='published').sort((a,b) => b.views - a.views).slice(0,5);
+  document.getElementById('trending-list').innerHTML = sorted.map((a,i) => `
+    <div class="trending-item" onclick="openArticle(${a.id})">
+      <div class="trending-num">0${i+1}</div>
+      <div class="trending-content">
+        <h4>${a.title}</h4>
+        <p>${a.category} · ${a.views.toLocaleString()} views</p>
+      </div>
+    </div>`).join('');
+}
+
+function renderAffiliates() {
+  const wrap = document.getElementById('affiliate-sidebar');
+  if (!wrap) return;
+  wrap.innerHTML = affiliates.slice(0,3).map(af => `
+    <a href="${af.link}" target="_blank" style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:var(--dark-border);border-radius:8px;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--dark-border-strong)'" onmouseout="this.style.background='var(--dark-border)'">
+      <span style="font-size:1.5rem">🎒</span>
+      <div>
+        <div style="font-size:0.8rem;font-weight:600;color:var(--text-primary)">${af.name}</div>
+        <div style="font-size:0.7rem;color:var(--gold)">View on Amazon →</div>
+      </div>
+    </a>`).join('');
+}
+
+function filterCat(cat, btn) {
+  currentFilter = cat;
+  showPage('home');
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderArticlesGrid(true);
+  setTimeout(() => document.getElementById('articles-section').scrollIntoView({behavior:'smooth'}), 100);
+}
+
+function loadMoreArticles() {
+  displayedCount += articlesPerPage;
+  renderArticlesGrid(false);
+}
+
+// ============================================================
+// ARTICLE PAGE
+// ============================================================
+function openArticle(id) {
+  const article = articles.find(a => a.id === id);
+  if (!article) return;
+  article.views = (article.views || 0) + 1;
+  DB.set('articles', articles);
+  document.getElementById('article-hero-img').src = article.image;
+  document.getElementById('article-page-cat').innerHTML = `<span class="article-cat-badge ${article.category}">${article.category}</span>`;
+  document.getElementById('article-page-title').textContent = article.title;
+  document.getElementById('article-page-author').textContent = article.author;
+  document.getElementById('article-page-date').textContent = formatDate(article.date);
+  document.getElementById('article-page-read').textContent = calcReadTime(article.body) + ' min read';
+  document.getElementById('article-page-views').textContent = article.views.toLocaleString() + ' views';
+  document.getElementById('article-body').innerHTML = article.body || '<p>Article content coming soon.</p>';
+  document.getElementById('comments-list').innerHTML = '';
+  const comments = DB.get('comments_'+id, []);
+  comments.forEach(c => renderComment(c, id));
+  document.title = article.title + ' — WildJourney';
+  showPage('article');
+  window._currentArticleId = id;
+}
+
+function calcReadTime(body) { if (!body) return 1; const words = body.replace(/<[^>]*>/g,'').split(/\s+/).length; return Math.max(1, Math.ceil(words/200)); }
+function formatDate(d) { try { return new Date(d).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}); } catch { return d; } }
+
+function shareArticle(platform) {
+  const url = encodeURIComponent(window.location.href);
+  const title = encodeURIComponent(document.getElementById('article-page-title').textContent);
+  const urls = { twitter: `https://twitter.com/intent/tweet?text=${title}&url=${url}`, facebook: `https://facebook.com/sharer/sharer.php?u=${url}`, whatsapp: `https://wa.me/?text=${title}%20${url}` };
+  window.open(urls[platform], '_blank');
+}
+function copyLink() { navigator.clipboard.writeText(window.location.href).then(() => showToast('Link Copied!','Share this article with your friends.','success')); }
+
+function addComment() {
+  const name = document.getElementById('comment-name').value.trim();
+  const text = document.getElementById('comment-text').value.trim();
+  if (!name || !text) { showToast('Error','Please fill in your name and comment.','error'); return; }
+  const comment = { name, text, date: new Date().toLocaleDateString() };
+  const id = window._currentArticleId;
+  const comments = DB.get('comments_'+id, []);
+  comments.unshift(comment);
+  DB.set('comments_'+id, comments);
+  renderComment(comment, id, true);
+  document.getElementById('comment-name').value = '';
+  document.getElementById('comment-text').value = '';
+  showToast('Comment Posted','Your comment has been published.','success');
+}
+
+function renderComment(c, id, prepend) {
+  const el = document.createElement('div');
+  el.className = 'comment-item';
+  el.innerHTML = `<div class="comment-author">${c.name}</div><div class="comment-date">${c.date}</div><div class="comment-text">${c.text}</div>`;
+  const list = document.getElementById('comments-list');
+  if (prepend) list.prepend(el); else list.appendChild(el);
+}
+
+// ============================================================
+// ADMIN AUTH — with attempt lockout + fake delay + auto-logout
+// ============================================================
+let _loginAttempts = 0;
+let _lockUntil = 0;
+let _autoLogoutTimer = null;
+
+function adminLogin() {
+  const now = Date.now();
+  // Lockout check
+  if (now < _lockUntil) return;
+
+  const user = document.getElementById('admin-user').value.trim();
+  const pass = document.getElementById('admin-pass').value;
+  const btn = document.getElementById('login-btn');
+
+  // Fake delay (brute-force protection)
+  btn.disabled = true;
+  btn.textContent = 'Verifying...';
+
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.textContent = 'Sign In Securely';
+
+    if (user === 'admin' && pass === adminPass) {
+      _loginAttempts = 0;
+      document.getElementById('login-error').style.display = 'none';
+      document.getElementById('attempts-warn').style.display = 'none';
+      document.getElementById('admin-pass').value = '';
+      showPage('admin-panel');
+      startAutoLogout();
+    } else {
+      _loginAttempts++;
+      document.getElementById('login-error').style.display = 'block';
+      document.getElementById('admin-pass').value = '';
+
+      const remaining = 5 - _loginAttempts;
+      if (_loginAttempts >= 5) {
+        // Lock for 30 seconds
+        _lockUntil = now + 30000;
+        _loginAttempts = 0;
+        startLockoutTimer(30);
+      } else {
+        const warn = document.getElementById('attempts-warn');
+        warn.style.display = 'block';
+        warn.textContent = `⚠ ${remaining} attempt${remaining===1?'':'s'} remaining before lockout.`;
+      }
+    }
+  }, 800 + Math.random() * 400); // 0.8–1.2s fake delay
+}
+
+function startLockoutTimer(secs) {
+  const banner = document.getElementById('lockout-banner');
+  const timerEl = document.getElementById('lockout-timer');
+  const btn = document.getElementById('login-btn');
+  banner.style.display = 'block';
+  document.getElementById('attempts-warn').style.display = 'none';
+  document.getElementById('login-error').style.display = 'none';
+  btn.disabled = true;
+  let t = secs;
+  timerEl.textContent = t;
+  const iv = setInterval(() => {
+    t--;
+    timerEl.textContent = t;
+    if (t <= 0) {
+      clearInterval(iv);
+      banner.style.display = 'none';
+      btn.disabled = false;
+    }
+  }, 1000);
+}
+
+function startAutoLogout() {
+  clearTimeout(_autoLogoutTimer);
+  // Auto-logout after 30 minutes of inactivity
+  _autoLogoutTimer = setTimeout(() => {
+    adminLogout();
+    showToast('Session Expired', 'You were logged out after 30 minutes of inactivity.', 'error');
+  }, 30 * 60 * 1000);
+}
+
+// Reset auto-logout timer on any admin interaction
+document.addEventListener('click', () => {
+  if (currentPage === 'admin-panel') startAutoLogout();
+});
+function adminLogout() { showPage('home'); }
+
+// ============================================================
+// ADMIN PANEL
+// ============================================================
+function showAdminSection(id, btn) {
+  document.querySelectorAll('.admin-panel-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('section-'+id).classList.add('active');
+  if (btn) {
+    document.querySelectorAll('.admin-nav button, .admin-nav a').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  const renderers = {
+    dashboard: renderDashboard, articles: renderFullArticlesTable,
+    categories: renderCategoriesTable, media: renderMediaGrid,
+    comments: renderCommentsTable, affiliate: renderAffiliateTable,
+    analytics: renderAnalytics,
+  };
+  if (renderers[id]) renderers[id]();
+}
+
+function initAdminPanel() {
+  renderDashboard();
+  updateStats();
+}
+
+function updateStats() {
+  const pub = articles.filter(a => a.status === 'published');
+  const totalViews = articles.reduce((s,a) => s + (a.views||0), 0);
+  document.getElementById('stat-articles').textContent = articles.length;
+  document.getElementById('stat-views').textContent = totalViews.toLocaleString();
+  document.getElementById('stat-subs').textContent = subscribers.length;
+  document.getElementById('stat-rev').textContent = '$' + (totalViews * 0.002).toFixed(0);
+  if (document.getElementById('nl-subs')) document.getElementById('nl-subs').textContent = subscribers.length;
+}
+
+function renderDashboard() {
+  updateStats();
+  renderViewsChart();
+  renderTrafficSources();
+  renderDashboardTable();
+}
+
+function renderViewsChart() {
+  const chart = document.getElementById('views-chart');
+  if (!chart) return;
+  const vals = Array.from({length:30}, () => Math.floor(200 + Math.random()*800));
+  const max = Math.max(...vals);
+  chart.innerHTML = vals.map(v => `<div class="mini-bar" style="height:${Math.round((v/max)*100)}%" title="${v} views"></div>`).join('');
+}
+
+function renderTrafficSources() {
+  const el = document.getElementById('traffic-sources');
+  if (!el) return;
+  const sources = [['Organic Search', 52], ['Social Media', 24], ['Direct', 14], ['Referral', 10]];
+  el.innerHTML = sources.map(([name, pct]) => `
+    <div>
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">
+        <span>${name}</span><span>${pct}%</span>
+      </div>
+      <div style="height:6px;background:var(--dark-border);border-radius:3px;overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:var(--green-accent);border-radius:3px;"></div>
+      </div>
+    </div>`).join('');
+}
+
+function renderDashboardTable() {
+  const tbody = document.getElementById('dashboard-articles-table');
+  if (!tbody) return;
+  const sorted = [...articles].sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,6);
+  tbody.innerHTML = sorted.map(a => `
+    <tr>
+      <td style="color:var(--text-primary);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.title}</td>
+      <td><span class="article-cat-badge ${a.category}" style="position:static;">${a.category}</span></td>
+      <td>${(a.views||0).toLocaleString()}</td>
+      <td><span class="status ${a.status}">${a.status}</span></td>
+      <td>${formatDate(a.date)}</td>
+      <td><div class="action-btns">
+        <button class="btn-sm btn-edit" onclick="editArticle(${a.id})">Edit</button>
+        <button class="btn-sm btn-view" onclick="openArticle(${a.id})">View</button>
+        <button class="btn-sm btn-delete" onclick="deleteArticle(${a.id})">Del</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function renderFullArticlesTable() {
+  const tbody = document.getElementById('full-articles-table');
+  if (!tbody) return;
+  const sorted = [...articles].sort((a,b) => new Date(b.date)-new Date(a.date));
+  tbody.innerHTML = sorted.map(a => `
+    <tr>
+      <td style="color:var(--text-primary);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.title}</td>
+      <td><span class="article-cat-badge ${a.category}" style="position:static;">${a.category}</span></td>
+      <td>${a.author}</td>
+      <td>${(a.views||0).toLocaleString()}</td>
+      <td><span class="status ${a.status}">${a.status}</span></td>
+      <td>${formatDate(a.date)}</td>
+      <td><div class="action-btns">
+        <button class="btn-sm btn-edit" onclick="editArticle(${a.id})">Edit</button>
+        <button class="btn-sm btn-view" onclick="openArticle(${a.id})">View</button>
+        <button class="btn-sm btn-delete" onclick="deleteArticle(${a.id})">Del</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function filterAdminArticles(q) {
+  const rows = document.querySelectorAll('#full-articles-table tr');
+  rows.forEach(r => r.style.display = r.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none');
+}
+function filterAdminArticlesCat(cat) {
+  renderFullArticlesTable();
+  if (cat === 'all') return;
+  const rows = document.querySelectorAll('#full-articles-table tr');
+  rows.forEach(r => { if (!r.textContent.toLowerCase().includes(cat)) r.style.display = 'none'; });
+}
+
+function renderAnalytics() {
+  const countries = document.getElementById('top-countries');
+  if (countries) {
+    const data = [['🇮🇳 India',28],['🇺🇸 USA',22],['🇬🇧 UK',14],['🇦🇺 Australia',9],['🇨🇦 Canada',7]];
+    countries.innerHTML = data.map(([c,p]) => `<div><div style="display:flex;justify-content:space-between;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;"><span>${c}</span><span>${p}%</span></div><div style="height:6px;background:var(--dark-border);border-radius:3px;"><div style="height:100%;width:${p}%;background:var(--gold);border-radius:3px;"></div></div></div>`).join('');
+  }
+  const devices = document.getElementById('device-stats');
+  if (devices) {
+    const data = [['📱 Mobile',61],['💻 Desktop',31],['📟 Tablet',8]];
+    devices.innerHTML = data.map(([d,p]) => `<div><div style="display:flex;justify-content:space-between;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;"><span>${d}</span><span>${p}%</span></div><div style="height:6px;background:var(--dark-border);border-radius:3px;"><div style="height:100%;width:${p}%;background:var(--blue-accent);border-radius:3px;"></div></div></div>`).join('');
+  }
+}
+
+// ============================================================
+// ARTICLE CRUD
+// ============================================================
+function saveArticle() {
+  const title = document.getElementById('edit-title').value.trim();
+  const body = document.getElementById('edit-body').value.trim();
+  const author = document.getElementById('edit-author').value.trim();
+  if (!title || !body || !author) { showToast('Error','Title, body, and author are required.','error'); return; }
+  const articleData = {
+    title, body, author,
+    category: document.getElementById('edit-category').value,
+    excerpt: document.getElementById('edit-excerpt').value || body.replace(/<[^>]*>/g,'').slice(0,150)+'...',
+    image: document.getElementById('edit-image').value || 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
+    tags: document.getElementById('edit-tags').value,
+    meta: document.getElementById('edit-meta').value,
+    status: document.getElementById('edit-status').value,
+    date: new Date().toISOString().split('T')[0],
+    views: 0,
+  };
+  const existingId = document.getElementById('edit-id').value;
+  if (existingId) {
+    const idx = articles.findIndex(a => a.id == existingId);
+    if (idx !== -1) { articles[idx] = { ...articles[idx], ...articleData }; }
+  } else {
+    articleData.id = Date.now();
+    articles.unshift(articleData);
+  }
+  DB.set('articles', articles);
+  clearEditor();
+  renderHome();
+  showToast('Article Saved!', 'Your article has been published successfully.', 'success');
+}
+
+function editArticle(id) {
+  const a = articles.find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('edit-id').value = a.id;
+  document.getElementById('edit-title').value = a.title;
+  document.getElementById('edit-category').value = a.category;
+  document.getElementById('edit-author').value = a.author;
+  document.getElementById('edit-excerpt').value = a.excerpt;
+  document.getElementById('edit-body').value = a.body;
+  document.getElementById('edit-image').value = a.image;
+  document.getElementById('edit-tags').value = a.tags || '';
+  document.getElementById('edit-meta').value = a.meta || '';
+  document.getElementById('edit-status').value = a.status;
+  document.getElementById('article-editor-title').textContent = 'Edit Article';
+  showAdminSection('new-article');
+}
+
+function deleteArticle(id) {
+  if (!confirm('Delete this article? This cannot be undone.')) return;
+  articles = articles.filter(a => a.id !== id);
+  DB.set('articles', articles);
+  renderHome();
+  renderDashboard();
+  renderFullArticlesTable();
+  showToast('Deleted','Article has been permanently deleted.','success');
+}
+
+function clearEditor() {
+  ['edit-id','edit-title','edit-author','edit-excerpt','edit-body','edit-image','edit-tags','edit-meta'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('edit-category').value = 'nature';
+  document.getElementById('edit-status').value = 'published';
+  document.getElementById('article-editor-title').textContent = 'New Article';
+}
+
+function previewArticle() {
+  const title = document.getElementById('edit-title').value;
+  const body = document.getElementById('edit-body').value;
+  if (!title) { showToast('Error','Add a title to preview.','error'); return; }
+  const fakeArticle = { id: -1, title, body, author: document.getElementById('edit-author').value||'Author', date: new Date().toISOString().split('T')[0], category: document.getElementById('edit-category').value, image: document.getElementById('edit-image').value||'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80', views: 0, excerpt: '' };
+  articles.unshift(fakeArticle);
+  openArticle(-1);
+  articles.shift();
+}
+
+function insertTag(tag) {
+  const ta = document.getElementById('edit-body');
+  const sel = ta.value.substring(ta.selectionStart, ta.selectionEnd);
+  const wrap = sel ? `<${tag}>${sel}</${tag}>` : `<${tag}>Your text here</${tag}>`;
+  const start = ta.selectionStart;
+  ta.value = ta.value.substring(0,start) + wrap + ta.value.substring(ta.selectionEnd);
+  ta.focus();
+}
+
+// ============================================================
+// AI ARTICLE GENERATOR (calls Anthropic API)
+// ============================================================
+async function generateAIArticle() {
+  const prompt = document.getElementById('ai-prompt').value.trim();
+  if (!prompt) { showToast('Error','Please enter a topic or prompt.','error'); return; }
+  const category = document.getElementById('ai-category').value;
+  const tone = document.getElementById('ai-tone').value;
+  document.getElementById('ai-loading').classList.add('active');
+  document.getElementById('ai-output').style.display = 'none';
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `You are a professional nature and travel writer for WildJourney magazine (similar to National Geographic).
+Write a compelling article in a ${tone} tone for the category: ${category}.
+
+Topic/Prompt: ${prompt}
+
+Format the article as:
+TITLE: [Compelling headline]
+EXCERPT: [2-3 sentence compelling summary]
+BODY:
+[Full article body using HTML tags: <h2> for sections, <p> for paragraphs, <blockquote> for quotes. Around 600-800 words.]
+
+Make it vivid, informative, and inspiring.`
+        }]
+      })
+    });
+    const data = await response.json();
+    const text = data.content?.[0]?.text || 'Could not generate article. Please try again.';
+    document.getElementById('ai-result').textContent = text;
+    document.getElementById('ai-output').style.display = 'block';
+  } catch(e) {
+    document.getElementById('ai-result').textContent = 'Error connecting to AI. Check your internet connection.';
+    document.getElementById('ai-output').style.display = 'block';
+  }
+  document.getElementById('ai-loading').classList.remove('active');
+}
+
+function regenerateAI() { generateAIArticle(); }
+
+function useAIArticle() {
+  const raw = document.getElementById('ai-result').textContent;
+  const titleMatch = raw.match(/TITLE:\s*(.+)/);
+  const excerptMatch = raw.match(/EXCERPT:\s*([\s\S]+?)BODY:/);
+  const bodyMatch = raw.match(/BODY:\s*([\s\S]+)/);
+  if (titleMatch) document.getElementById('edit-title').value = titleMatch[1].trim();
+  if (excerptMatch) document.getElementById('edit-excerpt').value = excerptMatch[1].trim();
+  if (bodyMatch) document.getElementById('edit-body').value = bodyMatch[1].trim();
+  document.getElementById('edit-category').value = document.getElementById('ai-category').value;
+  showAdminSection('new-article');
+  showToast('Article Loaded','Review and edit before publishing.','success');
+}
+
+// ============================================================
+// CATEGORIES
+// ============================================================
+function renderCategoriesTable() {
+  const tbody = document.getElementById('categories-table');
+  if (!tbody) return;
+  tbody.innerHTML = categories.map(cat => {
+    const count = articles.filter(a => a.category === cat.toLowerCase()).length;
+    return `<tr>
+      <td style="color:var(--text-primary)">${cat}</td>
+      <td style="color:var(--text-muted)">${cat.toLowerCase()}</td>
+      <td>${count}</td>
+      <td><button class="btn-sm btn-delete" onclick="deleteCategory('${cat}')">Delete</button></td>
+    </tr>`;
+  }).join('');
+}
+function addCategory() {
+  const name = document.getElementById('new-cat-name').value.trim();
+  if (!name) return;
+  categories.push(name);
+  DB.set('categories', categories);
+  document.getElementById('new-cat-name').value = '';
+  renderCategoriesTable();
+  showToast('Category Added','New category created.','success');
+}
+function deleteCategory(name) {
+  categories = categories.filter(c => c !== name);
+  DB.set('categories', categories);
+  renderCategoriesTable();
+}
+
+// ============================================================
+// MEDIA LIBRARY
+// ============================================================
+function renderMediaGrid() {
+  const grid = document.getElementById('media-grid');
+  const media = DB.get('media', []);
+  const sampleImages = articles.map(a => a.image).filter(Boolean).slice(0,6);
+  const all = [...new Set([...media, ...sampleImages])];
+  grid.innerHTML = all.map(url => `
+    <div style="position:relative;border-radius:8px;overflow:hidden;aspect-ratio:4/3;cursor:pointer;background:var(--dark-card);" onclick="copyMediaUrl('${url}')">
+      <img src="${url}" style="width:100%;height:100%;object-fit:cover;" loading="lazy" alt="">
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);opacity:0;transition:opacity 0.2s;display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:#fff;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">Copy URL</div>
+    </div>`).join('');
+}
+function handleFileUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const media = DB.get('media', []);
+    media.unshift(e.target.result);
+    DB.set('media', media.slice(0,20));
+    renderMediaGrid();
+    showToast('Uploaded!','Image added to your media library.','success');
+  };
+  reader.readAsDataURL(file);
+}
+function copyMediaUrl(url) {
+  navigator.clipboard.writeText(url);
+  showToast('URL Copied','Image URL copied to clipboard.','success');
+}
+
+// ============================================================
+// COMMENTS ADMIN
+// ============================================================
+function renderCommentsTable() {
+  const tbody = document.getElementById('comments-table');
+  if (!tbody) return;
+  let all = [];
+  articles.forEach(a => {
+    const comments = DB.get('comments_'+a.id, []);
+    comments.forEach(c => all.push({...c, articleTitle: a.title, articleId: a.id}));
+  });
+  tbody.innerHTML = all.length ? all.map(c => `
+    <tr>
+      <td style="color:var(--text-primary)">${c.name}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.text}</td>
+      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-muted)">${c.articleTitle}</td>
+      <td>${c.date}</td>
+      <td><button class="btn-sm btn-delete" onclick="deleteComment(${c.articleId},'${c.text.slice(0,20)}')">Delete</button></td>
+    </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:2rem">No comments yet.</td></tr>';
+}
+function deleteComment(articleId, textFragment) {
+  const comments = DB.get('comments_'+articleId, []);
+  const filtered = comments.filter(c => !c.text.startsWith(textFragment));
+  DB.set('comments_'+articleId, filtered);
+  renderCommentsTable();
+  showToast('Deleted','Comment removed.','success');
+}
+
+// ============================================================
+// AFFILIATE
+// ============================================================
+function renderAffiliateTable() {
+  const tbody = document.getElementById('affiliate-table');
+  if (!tbody) return;
+  tbody.innerHTML = affiliates.map(af => `
+    <tr>
+      <td style="color:var(--text-primary)">${af.name}</td>
+      <td style="color:var(--gold)">${af.commission}</td>
+      <td>${af.clicks}</td>
+      <td>${af.conversions}</td>
+      <td><button class="btn-sm btn-delete" onclick="deleteAffiliate(${af.id})">Remove</button></td>
+    </tr>`).join('');
+}
+function addAffiliate() {
+  const name = document.getElementById('aff-name').value.trim();
+  const link = document.getElementById('aff-link').value.trim();
+  if (!name || !link) { showToast('Error','Name and link are required.','error'); return; }
+  affiliates.push({ id: Date.now(), name, link, commission: document.getElementById('aff-commission').value||'5%', clicks: 0, conversions: 0 });
+  DB.set('affiliates', affiliates);
+  renderAffiliateTable();
+  renderAffiliates();
+  showToast('Affiliate Added','Product added to affiliate program.','success');
+}
+function deleteAffiliate(id) {
+  affiliates = affiliates.filter(a => a.id !== id);
+  DB.set('affiliates', affiliates);
+  renderAffiliateTable();
+}
+
+// ============================================================
+// NEWSLETTER
+// ============================================================
+function subscribeNewsletter() {
+  const email = document.getElementById('newsletter-email').value.trim();
+  if (!email || !email.includes('@')) { showToast('Error','Please enter a valid email.','error'); return; }
+  if (!subscribers.includes(email)) { subscribers.push(email); DB.set('subscribers', subscribers); }
+  document.getElementById('newsletter-email').value = '';
+  showToast('Subscribed! 🎉','Welcome to WildJourney — check your inbox soon.','success');
+}
+
+// ============================================================
+// SETTINGS
+// ============================================================
+function saveSettings() {
+  const newPass = document.getElementById('new-admin-pass').value;
+  if (newPass) { adminPass = newPass; DB.set('admin_pass', adminPass); }
+  showToast('Settings Saved','Your site settings have been updated.','success');
+}
+function saveAdsense() { showToast('AdSense Saved','AdSense configuration updated.','success'); }
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(title, msg, type) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-title').textContent = title;
+  document.getElementById('toast-msg').textContent = msg;
+  toast.className = type || '';
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 4000);
+}
+
+// ============================================================
+// SCROLL ANIMATIONS
+// ============================================================
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+function initObserver() { document.querySelectorAll('.fade-in').forEach(el => observer.observe(el)); }
+
+// ============================================================
+// SCROLL HELPERS
+// ============================================================
+function scrollToArticles() { document.getElementById('articles-section').scrollIntoView({behavior:'smooth'}); }
+function scrollToNewsletter() { document.getElementById('newsletter').scrollIntoView({behavior:'smooth'}); }
+
+// ============================================================
+// HOME RENDER
+// ============================================================
+function renderHome() {
+  renderFeaturedGrid();
+  renderArticlesGrid(true);
+  renderTrending();
+  renderAffiliates();
+  initObserver();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+  showPage('home');
+  renderHome();
+});
+</script>
+</body>
+</html>
