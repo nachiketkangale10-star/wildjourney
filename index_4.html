@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WildJourney - Premium Nature Adventures</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background: #000;
+        overflow-x: hidden;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      @keyframes floatLeaf {
+        0% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-20px) rotate(10deg);
+        }
+        100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+      }
+
+      .leaf {
+        animation: floatLeaf infinite ease-in-out;
+      }
+
+      @keyframes slowZoom {
+        from {
+          transform: scale(1);
+        }
+        to {
+          transform: scale(1.1);
+        }
+      }
+
+      .hero-bg {
+        animation: slowZoom 20s ease-in-out infinite alternate;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .fade-in-up {
+        animation: fadeInUp 0.6s ease-out;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(-100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      .slide-in {
+        animation: slideIn 0.5s ease-out;
+      }
+
+      .nav-active {
+        color: #D4AF37;
+        border-bottom: 2px solid #D4AF37;
+        padding-bottom: 5px;
+      }
+
+      .filter-btn-active {
+        background: #D4AF37;
+        color: #000;
+      }
+
+      .card-hover:hover {
+        transform: translateY(-12px);
+      }
+
+      .heart-btn {
+        transition: transform 0.2s, color 0.2s;
+      }
+
+      .heart-btn.active {
+        color: #D4AF37;
+        transform: scale(1.2);
+      }
+
+      .star-rating {
+        display: flex;
+        gap: 4px;
+        cursor: pointer;
+      }
+
+      .star {
+        font-size: 20px;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+
+      .star:hover,
+      .star.active {
+        transform: scale(1.2);
+        color: #D4AF37;
+      }
+
+      input:focus,
+      textarea:focus,
+      select:focus {
+        outline: none;
+        border-color: #D4AF37 !important;
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+      }
+
+      .input-field {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #F5F1E8;
+        padding: 12px 16px;
+        border-radius: 8px;
+        transition: all 0.3s;
+      }
+
+      .input-field::placeholder {
+        color: rgba(245, 241, 232, 0.5);
+      }
+
+      .success-message {
+        animation: slideIn 0.4s ease-out;
+        background: rgba(79, 172, 254, 0.1);
+        border-left: 3px solid #4FACFE;
+      }
+
+      .story-modal {
+        animation: fadeInUp 0.4s ease-out;
+      }
+
+      .difficulty-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+      }
+
+      .difficulty-easy {
+        background: rgba(74, 222, 128, 0.2);
+        color: #4ADE80;
+      }
+
+      .difficulty-medium {
+        background: rgba(251, 191, 36, 0.2);
+        color: #FBBF24;
+      }
+
+      .difficulty-hard {
+        background: rgba(239, 68, 68, 0.2);
+        color: #EF4444;
+      }
+
+      .scroll-indicator {
+        animation: bounce 2s infinite;
+      }
+
+      @keyframes bounce {
+        0%, 100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(10px);
+        }
+      }
+
+      .backdrop-blur-heavy {
+        backdrop-filter: blur(16px);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="bg-black text-[#F5F1E8] overflow-x-hidden">
+      <!-- Navbar -->
+      <nav
+        class="fixed top-0 left-0 w-full z-50 backdrop-blur-xl bg-white/10 border-b border-white/10"
+      >
+        <div
+          class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between"
+        >
+          <h1
+            class="text-3xl font-bold tracking-wide text-[#D4AF37] cursor-pointer hover:scale-105 transition"
+            style="font-family: 'Playfair Display', serif"
+            onclick="scrollToSection('hero')"
+          >
+            WildJourney
+          </h1>
+
+          <div
+            class="hidden md:flex items-center gap-8 text-sm uppercase tracking-[2px]"
+          >
+            <a
+              href="#hero"
+              class="nav-link hover:text-[#D4AF37] transition duration-300"
+              onclick="setActiveNav(event)"
+              >Home</a
+            >
+            <a
+              href="#stories"
+              class="nav-link hover:text-[#D4AF37] transition duration-300"
+              onclick="setActiveNav(event)"
+              >Stories</a
+            >
+            <a
+              href="#adventures"
+              class="nav-link hover:text-[#D4AF37] transition duration-300"
+              onclick="setActiveNav(event)"
+              >Adventures</a
+            >
+            <a
+              href="#mountains"
+              class="nav-link hover:text-[#D4AF37] transition duration-300"
+              onclick="setActiveNav(event)"
+              >Mountains</a
+            >
+            <a
+              href="#wishlist"
+              class="nav-link hover:text-[#D4AF37] transition duration-300"
+              onclick="setActiveNav(event)"
+              >Wishlist (<span id="wishlist-count">0</span>)</a
+            >
+            <a
+              href="#contact"
+              class="nav-link hover:text-[#D4AF37] transition duration-300"
+              onclick="setActiveNav(event)"
+              >Contact</a
+            >
+          </div>
+
+          <button
+            id="search-btn"
+            class="hidden md:block px-4 py-2 rounded-full border border-[#D4AF37]/50 hover:bg-[#D4AF37]/10 transition"
+            onclick="toggleSearch()"
+          >
+            🔍
+          </button>
+        </div>
+
+        <!-- Search Bar -->
+        <div
+          id="search-container"
+          class="hidden max-w-7xl mx-auto px-6 pb-4"
+        >
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search adventures, locations, wildlife..."
+            class="input-field w-full"
+            onkeyup="filterStories()"
+          />
+        </div>
+      </nav>
+
+      <!-- Hero Section -->
+      <section
+        id="hero"
+        class="relative h-screen w-full flex items-center justify-center overflow-hidden pt-20"
+      >
+        <!-- Background -->
+        <div
+          class="absolute inset-0 hero-bg"
+          style="
+            background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+          "
+        ></div>
+
+        <!-- Overlay -->
+        <div
+          class="absolute inset-0 bg-gradient-to-b from-black/50 via-black/60 to-black"
+        ></div>
+
+        <!-- Fog -->
+        <div
+          class="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.12),transparent_60%)]"
+        ></div>
+
+        <!-- Floating Leaves -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+          <div
+            class="leaf absolute text-[#D4AF37]/30 text-2xl"
+            style="left:10%; top:20%; animation-duration:6s;"
+          >
+            🍃
+          </div>
+          <div
+            class="leaf absolute text-[#D4AF37]/30 text-2xl"
+            style="left:80%; top:15%; animation-duration:8s;"
+          >
+            🍃
+          </div>
+          <div
+            class="leaf absolute text-[#D4AF37]/30 text-2xl"
+            style="left:30%; top:70%; animation-duration:7s;"
+          >
+            🍃
+          </div>
+          <div
+            class="leaf absolute text-[#D4AF37]/30 text-2xl"
+            style="left:65%; top:60%; animation-duration:9s;"
+          >
+            🍃
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="relative z-10 text-center px-6 max-w-5xl fade-in-up">
+          <p class="uppercase tracking-[6px] text-[#D4AF37] mb-6 text-sm">
+            Luxury Nature Documentary Platform
+          </p>
+
+          <h1
+            class="text-5xl md:text-8xl font-bold leading-tight mb-8 drop-shadow-2xl"
+            style="font-family: 'Playfair Display', serif"
+          >
+            Where Nature Tells Its Stories
+          </h1>
+
+          <p
+            class="max-w-3xl mx-auto text-lg md:text-2xl text-[#F5F1E8]/80 leading-relaxed mb-12"
+          >
+            Explore breathtaking wildlife, cinematic landscapes, and
+            unforgettable adventures across the world. Control your journey.
+          </p>
+
+          <div class="flex flex-col md:flex-row items-center justify-center gap-6">
+            <button
+              class="px-8 py-4 rounded-full bg-[#D4AF37] text-black font-semibold hover:scale-105 transition duration-300 shadow-[0_0_40px_rgba(212,175,55,0.6)]"
+              onclick="scrollToSection('adventures')"
+            >
+              Explore Adventures
+            </button>
+
+            <button
+              class="px-8 py-4 rounded-full border border-[#F5F1E8]/30 bg-white/10 backdrop-blur-lg hover:bg-white/20 transition duration-300"
+              onclick="scrollToSection('stories')"
+            >
+              Watch Stories
+            </button>
+          </div>
+
+          <div class="mt-16">
+            <button
+              class="px-6 py-3 bg-[#1F3B2D]/70 border border-[#D4AF37]/30 rounded-full backdrop-blur-lg hover:bg-[#1F3B2D] transition duration-300"
+            >
+              🔊 Nature Sound
+            </button>
+          </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div
+          class="absolute bottom-8 left-1/2 transform -translate-x-1/2 scroll-indicator"
+        >
+          <svg
+            class="w-6 h-6 text-[#D4AF37]"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 14l-7 7m0 0l-7-7m7 7V3"
+            ></path>
+          </svg>
+        </div>
+      </section>
+
+      <!-- Featured Stories with Filters -->
+      <section id="stories" class="py-28 px-6 bg-[#0B1D13]">
+        <div class="max-w-7xl mx-auto">
+          <div class="mb-12">
+            <p class="text-[#D4AF37] uppercase tracking-[4px] mb-3 text-sm">
+              Featured Stories
+            </p>
+            <div
+              class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
+            >
+              <h2
+                class="text-4xl md:text-6xl font-bold"
+                style="font-family: 'Cormorant Garamond', serif"
+              >
+                Nature Through a Cinematic Lens
+              </h2>
+            </div>
+          </div>
+
+          <!-- Category Filters -->
+          <div class="mb-8 flex flex-wrap gap-3">
+            <button
+              class="filter-btn-active px-6 py-2 rounded-full border border-[#D4AF37]/50 transition"
+              onclick="filterByCategory('all')"
+            >
+              All Stories
+            </button>
+            <button
+              class="px-6 py-2 rounded-full border border-white/30 hover:border-[#D4AF37]/50 transition"
+              onclick="filterByCategory('forest')"
+            >
+              🌲 Forests
+            </button>
+            <button
+              class="px-6 py-2 rounded-full border border-white/30 hover:border-[#D4AF37]/50 transition"
+              onclick="filterByCategory('wildlife')"
+            >
+              🦁 Wildlife
+            </button>
+            <button
+              class="px-6 py-2 rounded-full border border-white/30 hover:border-[#D4AF37]/50 transition"
+              onclick="filterByCategory('mountains')"
+            >
+              ⛰️ Mountains
+            </button>
+            <button
+              class="px-6 py-2 rounded-full border border-white/30 hover:border-[#D4AF37]/50 transition"
+              onclick="filterByCategory('ocean')"
+            >
+              🌊 Ocean
+            </button>
+          </div>
+
+          <!-- Stories Grid -->
+          <div id="stories-grid" class="grid md:grid-cols-3 gap-8">
+            <!-- Stories will be populated by JavaScript -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Adventures Section with Difficulty Control -->
+      <section id="adventures" class="py-28 px-6 bg-black">
+        <div class="max-w-7xl mx-auto">
+          <div class="mb-12">
+            <p class="text-[#D4AF37] uppercase tracking-[4px] mb-3 text-sm">
+              Select Your Adventure
+            </p>
+            <h2
+              class="text-4xl md:text-6xl font-bold mb-6"
+              style="font-family: 'Cormorant Garamond', serif"
+            >
+              Curate Your Experience
+            </h2>
+
+            <!-- Difficulty Filter -->
+            <div class="flex flex-wrap gap-3 mt-6">
+              <span class="text-sm text-[#F5F1E8]/70">Filter by difficulty:</span>
+              <button
+                class="px-4 py-2 rounded-full border border-white/30 hover:border-[#D4AF37]/50 transition text-sm"
+                onclick="filterAdventuresByDifficulty('all')"
+              >
+                All Levels
+              </button>
+              <button
+                class="px-4 py-2 rounded-full border border-white/30 hover:border-[#D4AF37]/50 transition text-sm difficulty-easy"
+                onclick="filterAdventuresByDifficulty('easy')"
+              >
+                Easy
+              </button>
+              <button
+                class="px-4 py-2 rounded-full border border-white/30 hover:border-[#D4AF37]/50 transition text-sm difficulty-medium"
+                onclick="filterAdventuresByDifficulty('medium')"
+              >
+                Medium
+              </button>
+              <button
+                class="px-4 py-2 rounded-full border border-white/30 hover:border-[#D4AF37]/50 transition text-sm difficulty-hard"
+                onclick="filterAdventuresByDifficulty('hard')"
+              >
+                Hard
+              </button>
+            </div>
+          </div>
+
+          <!-- Adventures Grid -->
+          <div id="adventures-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Adventures will be populated by JavaScript -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Mountains Experience Section -->
+      <section id="mountains" class="relative h-screen w-full flex items-center justify-center overflow-hidden py-28">
+        <!-- Background with Mountains and Sky -->
+        <div
+          class="absolute inset-0 hero-bg"
+          style="
+            background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+          "
+        ></div>
+
+        <!-- Subtle Overlay -->
+        <div
+          class="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/40"
+        ></div>
+
+        <!-- Floating Elements -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+          <div
+            class="leaf absolute text-white/20 text-4xl"
+            style="left:15%; top:25%; animation-duration:7s;"
+          >
+            ❄️
+          </div>
+          <div
+            class="leaf absolute text-white/20 text-4xl"
+            style="left:85%; top:20%; animation-duration:9s;"
+          >
+            ❄️
+          </div>
+          <div
+            class="leaf absolute text-white/20 text-4xl"
+            style="left:25%; top:75%; animation-duration:8s;"
+          >
+            ❄️
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="relative z-10 text-center px-6 max-w-5xl fade-in-up">
+          <p class="uppercase tracking-[6px] text-white mb-6 text-sm drop-shadow-lg">
+            Peak Adventure Awaits
+          </p>
+
+          <h1
+            class="text-5xl md:text-8xl font-bold leading-tight mb-8 drop-shadow-2xl text-white"
+            style="font-family: 'Playfair Display', serif"
+          >
+            Mountain Majesty
+          </h1>
+
+          <p
+            class="max-w-3xl mx-auto text-lg md:text-2xl text-white/80 leading-relaxed mb-12 drop-shadow-lg"
+          >
+            Scale the world's most breathtaking peaks. Feel the crisp alpine air, witness panoramic vistas, and conquer your limits.
+          </p>
+
+          <div class="flex flex-col md:flex-row items-center justify-center gap-6">
+            <button
+              class="px-8 py-4 rounded-full bg-white text-black font-semibold hover:scale-105 transition duration-300 shadow-[0_0_40px_rgba(255,255,255,0.4)]"
+              onclick="document.getElementById('adventures').scrollIntoView({behavior: 'smooth'})"
+            >
+              Book Mountain Adventure
+            </button>
+
+            <button
+              class="px-8 py-4 rounded-full border border-white/50 bg-white/10 backdrop-blur-lg hover:bg-white/20 transition duration-300 text-white"
+            >
+              View Gallery
+            </button>
+          </div>
+
+          <!-- Mountain Stats -->
+          <div class="mt-16 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
+            <div class="text-center">
+              <div class="text-3xl font-bold text-white mb-2 drop-shadow-lg">28</div>
+              <p class="text-white/70 text-sm">Peak Routes</p>
+            </div>
+            <div class="text-center">
+              <div class="text-3xl font-bold text-white mb-2 drop-shadow-lg">50+</div>
+              <p class="text-white/70 text-sm">Expert Guides</p>
+            </div>
+            <div class="text-center">
+              <div class="text-3xl font-bold text-white mb-2 drop-shadow-lg">5000m</div>
+              <p class="text-white/70 text-sm">Max Altitude</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mountain Features Grid -->
+      <section class="py-28 px-6 bg-gradient-to-b from-black to-[#0B1D13]">
+        <div class="max-w-7xl mx-auto">
+          <div class="mb-16 text-center">
+            <p class="text-white/70 uppercase tracking-[4px] mb-3 text-sm">
+              Why Choose Our Mountains
+            </p>
+            <h2
+              class="text-4xl md:text-6xl font-bold"
+              style="font-family: 'Cormorant Garamond', serif"
+            >
+              Premium Mountain Experiences
+            </h2>
+          </div>
+
+          <div class="grid md:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <div
+              class="relative overflow-hidden rounded-[20px] bg-gradient-to-br from-[#1F3B2D]/60 to-[#0B1D13]/60 border border-white/10 p-8 hover:-translate-y-3 transition duration-500"
+            >
+              <div class="text-4xl mb-4">🏔️</div>
+              <h3 class="text-2xl font-bold mb-3">Expert Guides</h3>
+              <p class="text-[#F5F1E8]/70">
+                Certified mountaineers with 20+ years of experience leading expeditions safely and memorably.
+              </p>
+              <button class="text-white hover:text-[#D4AF37] transition mt-4">
+                Learn More →
+              </button>
+            </div>
+
+            <!-- Feature 2 -->
+            <div
+              class="relative overflow-hidden rounded-[20px] bg-gradient-to-br from-[#1F3B2D]/60 to-[#0B1D13]/60 border border-white/10 p-8 hover:-translate-y-3 transition duration-500"
+            >
+              <div class="text-4xl mb-4">🎒</div>
+              <h3 class="text-2xl font-bold mb-3">Complete Gear</h3>
+              <p class="text-[#F5F1E8]/70">
+                Professional-grade equipment provided for all climbers. Safety first, comfort second, adventure always.
+              </p>
+              <button class="text-white hover:text-[#D4AF37] transition mt-4">
+                See Equipment →
+              </button>
+            </div>
+
+            <!-- Feature 3 -->
+            <div
+              class="relative overflow-hidden rounded-[20px] bg-gradient-to-br from-[#1F3B2D]/60 to-[#0B1D13]/60 border border-white/10 p-8 hover:-translate-y-3 transition duration-500"
+            >
+              <div class="text-4xl mb-4">📸</div>
+              <h3 class="text-2xl font-bold mb-3">Cinematic Moments</h3>
+              <p class="text-[#F5F1E8]/70">
+                Professional photographers capture every milestone. Your adventure immortalized in stunning imagery.
+              </p>
+              <button class="text-white hover:text-[#D4AF37] transition mt-4">
+                View Portfolio →
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Wishlist Section -->
+      <section id="wishlist" class="py-28 px-6 bg-[#0B1D13]">
+        <div class="max-w-7xl mx-auto">
+          <h2
+            class="text-4xl md:text-6xl font-bold mb-12"
+            style="font-family: 'Cormorant Garamond', serif"
+          >
+            Your Wishlist
+            <span id="wishlist-badge" class="text-2xl text-[#D4AF37]">(0)</span>
+          </h2>
+
+          <div id="wishlist-container" class="grid md:grid-cols-3 gap-8">
+            <div class="col-span-full text-center py-12">
+              <p class="text-[#F5F1E8]/60">
+                No items in your wishlist yet. Click the ❤️ icon on stories to
+                add them!
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Newsletter Section -->
+      <section class="py-28 px-6 bg-[#1F3B2D]/30">
+        <div class="max-w-3xl mx-auto">
+          <div class="text-center mb-12">
+            <p class="text-[#D4AF37] uppercase tracking-[4px] mb-3 text-sm">
+              Stay Connected
+            </p>
+            <h2
+              class="text-4xl md:text-5xl font-bold mb-4"
+              style="font-family: 'Playfair Display', serif"
+            >
+              Get Exclusive Adventures
+            </h2>
+            <p class="text-[#F5F1E8]/70">
+              Subscribe to receive curated nature stories and adventure updates
+              delivered to your inbox.
+            </p>
+          </div>
+
+          <form
+            id="newsletter-form"
+            class="flex flex-col gap-4"
+            onsubmit="handleNewsletter(event)"
+          >
+            <input
+              type="email"
+              placeholder="Your email address"
+              class="input-field"
+              required
+            />
+            <select class="input-field" required>
+              <option value="">Select your interests...</option>
+              <option value="wildlife">🦁 Wildlife</option>
+              <option value="forests">🌲 Forests</option>
+              <option value="mountains">⛰️ Mountains</option>
+              <option value="ocean">🌊 Ocean</option>
+              <option value="all">All Adventures</option>
+            </select>
+            <button
+              type="submit"
+              class="px-8 py-4 rounded-full bg-[#D4AF37] text-black font-semibold hover:scale-105 transition duration-300 shadow-[0_0_40px_rgba(212,175,55,0.6)]"
+            >
+              Subscribe Now
+            </button>
+          </form>
+
+          <div
+            id="newsletter-message"
+            class="hidden mt-6 p-4 rounded-lg success-message"
+          >
+            ✅ Thank you! Check your email for a special welcome offer.
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact Section -->
+      <section id="contact" class="py-28 px-6 bg-black">
+        <div class="max-w-3xl mx-auto">
+          <h2
+            class="text-4xl md:text-5xl font-bold mb-12 text-center"
+            style="font-family: 'Playfair Display', serif"
+          >
+            Get in Touch
+          </h2>
+
+          <form
+            id="contact-form"
+            class="space-y-4"
+            onsubmit="handleContactSubmit(event)"
+          >
+            <div class="grid md:grid-cols-2 gap-4">
+              <input
+                type="text"
+                placeholder="Your name"
+                class="input-field"
+                required
+              />
+              <input
+                type="email"
+                placeholder="Your email"
+                class="input-field"
+                required
+              />
+            </div>
+
+            <input
+              type="text"
+              placeholder="Subject"
+              class="input-field w-full"
+              required
+            />
+
+            <textarea
+              placeholder="Your message..."
+              rows="6"
+              class="input-field w-full resize-none"
+              required
+            ></textarea>
+
+            <button
+              type="submit"
+              class="w-full px-8 py-4 rounded-full bg-[#D4AF37] text-black font-semibold hover:scale-105 transition duration-300"
+            >
+              Send Message
+            </button>
+          </form>
+
+          <div
+            id="contact-message"
+            class="hidden mt-6 p-4 rounded-lg success-message"
+          >
+            ✅ Message sent! We'll get back to you within 24 hours.
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="py-10 px-6 border-t border-white/10 bg-[#000]">
+        <div
+          class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-5"
+        >
+          <h2
+            class="text-3xl text-[#D4AF37] font-bold"
+            style="font-family: 'Playfair Display', serif"
+          >
+            WildJourney
+          </h2>
+
+          <div class="flex gap-6 text-sm">
+            <a href="#" class="hover:text-[#D4AF37] transition">Privacy</a>
+            <a href="#" class="hover:text-[#D4AF37] transition">Terms</a>
+            <a href="#" class="hover:text-[#D4AF37] transition">Sitemap</a>
+          </div>
+
+          <p class="text-[#F5F1E8]/60 text-sm text-center md:text-right">
+            © 2026 WildJourney — Luxury Cinematic Nature Experiences.
+          </p>
+        </div>
+      </footer>
+
+      <!-- Story Modal -->
+      <div
+        id="story-modal"
+        class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-heavy flex items-center justify-center p-6"
+        onclick="closeStoryModal(event)"
+      >
+        <div
+          class="story-modal bg-[#0B1D13] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 border border-white/10"
+          onclick="event.stopPropagation()"
+        >
+          <button
+            class="float-right text-2xl hover:text-[#D4AF37] transition mb-4"
+            onclick="closeStoryModal()"
+          >
+            ✕
+          </button>
+
+          <div id="modal-content">
+            <!-- Content will be populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Control Button (Bottom Right) -->
+      <button
+        id="admin-toggle"
+        class="fixed bottom-6 right-6 z-40 px-4 py-3 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black transition duration-300 font-semibold text-sm"
+        onclick="toggleAdminPanel()"
+        title="Admin Control Panel"
+      >
+        🔐 Admin
+      </button>
+
+      <!-- Admin Login Panel -->
+      <div
+        id="admin-login"
+        class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-heavy flex items-center justify-center p-6"
+      >
+        <div
+          class="bg-[#0B1D13] rounded-2xl max-w-md w-full p-8 border border-[#D4AF37]/50"
+        >
+          <h2
+            class="text-3xl font-bold mb-6 text-[#D4AF37]"
+            style="font-family: 'Playfair Display', serif"
+          >
+            Admin Access
+          </h2>
+
+          <div class="space-y-4">
+            <input
+              type="password"
+              id="admin-password"
+              placeholder="Enter Admin Password"
+              class="input-field w-full"
+              onkeypress="if(event.key === 'Enter') loginAdmin()"
+            />
+            <div class="flex gap-3">
+              <button
+                class="flex-1 px-4 py-3 rounded-full bg-[#D4AF37] text-black font-semibold hover:scale-105 transition"
+                onclick="loginAdmin()"
+              >
+                Login
+              </button>
+              <button
+                class="flex-1 px-4 py-3 rounded-full border border-white/30 hover:bg-white/10 transition"
+                onclick="toggleAdminPanel()"
+              >
+                Close
+              </button>
+            </div>
+            <p class="text-xs text-[#F5F1E8]/50 text-center">
+              Password: admin123
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Control Dashboard -->
+      <div
+        id="admin-dashboard"
+        class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur-heavy overflow-y-auto"
+      >
+        <!-- Admin Header -->
+        <div
+          class="sticky top-0 bg-[#0B1D13] border-b border-[#D4AF37]/30 p-6"
+        >
+          <div
+            class="max-w-7xl mx-auto flex items-center justify-between"
+          >
+            <h1
+              class="text-3xl font-bold text-[#D4AF37]"
+              style="font-family: 'Playfair Display', serif"
+            >
+              Admin Dashboard
+            </h1>
+            <button
+              class="px-4 py-2 rounded-full bg-red-500/20 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition"
+              onclick="logoutAdmin()"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+
+        <!-- Admin Content -->
+        <div class="max-w-7xl mx-auto p-6">
+          <!-- Tab Navigation -->
+          <div class="flex gap-4 mb-8 flex-wrap">
+            <button
+              class="admin-tab-btn active px-6 py-3 rounded-full border-2 border-[#D4AF37] bg-[#D4AF37] text-black font-semibold"
+              onclick="switchAdminTab('stories')"
+            >
+              📖 Manage Stories
+            </button>
+            <button
+              class="admin-tab-btn px-6 py-3 rounded-full border-2 border-white/30 hover:border-[#D4AF37] transition"
+              onclick="switchAdminTab('adventures')"
+            >
+              🎒 Manage Adventures
+            </button>
+            <button
+              class="admin-tab-btn px-6 py-3 rounded-full border-2 border-white/30 hover:border-[#D4AF37] transition"
+              onclick="switchAdminTab('submissions')"
+            >
+              📧 Submissions
+            </button>
+            <button
+              class="admin-tab-btn px-6 py-3 rounded-full border-2 border-white/30 hover:border-[#D4AF37] transition"
+              onclick="switchAdminTab('analytics')"
+            >
+              📊 Analytics
+            </button>
+          </div>
+
+          <!-- Stories Management Tab -->
+          <div id="stories-tab" class="admin-tab">
+            <div class="mb-8">
+              <h2
+                class="text-2xl font-bold mb-4 text-[#D4AF37]"
+              >
+                Stories Management
+              </h2>
+              <button
+                class="px-6 py-3 rounded-full bg-[#D4AF37] text-black font-semibold hover:scale-105 transition"
+                onclick="showStoryForm()"
+              >
+                ➕ Add New Story
+              </button>
+            </div>
+
+            <!-- Add Story Form -->
+            <div
+              id="story-form"
+              class="hidden bg-[#1F3B2D]/40 p-8 rounded-xl border border-white/10 mb-8"
+            >
+              <h3 class="text-xl font-bold mb-6">Add New Story</h3>
+              <div class="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Story Title"
+                  class="input-field w-full"
+                  id="story-title"
+                />
+                <select class="input-field w-full" id="story-category">
+                  <option value="">Select Category</option>
+                  <option value="forest">🌲 Forest</option>
+                  <option value="wildlife">🦁 Wildlife</option>
+                  <option value="mountains">⛰️ Mountains</option>
+                  <option value="ocean">🌊 Ocean</option>
+                  <option value="other">Other</option>
+                </select>
+                <textarea
+                  placeholder="Short Description"
+                  class="input-field w-full resize-none"
+                  rows="3"
+                  id="story-desc"
+                ></textarea>
+                <textarea
+                  placeholder="Full Description"
+                  class="input-field w-full resize-none"
+                  rows="4"
+                  id="story-full-desc"
+                ></textarea>
+                <input
+                  type="text"
+                  placeholder="Image URL"
+                  class="input-field w-full"
+                  id="story-image"
+                />
+                <input
+                  type="number"
+                  placeholder="Duration (minutes)"
+                  class="input-field w-full"
+                  id="story-duration"
+                />
+                <input
+                  type="number"
+                  placeholder="Rating (0-5)"
+                  step="0.1"
+                  class="input-field w-full"
+                  id="story-rating"
+                />
+                <div class="flex gap-3">
+                  <button
+                    class="flex-1 px-4 py-3 rounded-full bg-[#D4AF37] text-black font-semibold hover:scale-105 transition"
+                    onclick="addNewStory()"
+                  >
+                    Save Story
+                  </button>
+                  <button
+                    class="flex-1 px-4 py-3 rounded-full border border-white/30 hover:bg-white/10 transition"
+                    onclick="hideStoryForm()"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stories List -->
+            <div id="stories-list" class="space-y-4">
+              <!-- Will be populated by JavaScript -->
+            </div>
+          </div>
+
+          <!-- Adventures Management Tab -->
+          <div id="adventures-tab" class="admin-tab hidden">
+            <div class="mb-8">
+              <h2 class="text-2xl font-bold mb-4 text-[#D4AF37]">
+                Adventures Management
+              </h2>
+              <button
+                class="px-6 py-3 rounded-full bg-[#D4AF37] text-black font-semibold hover:scale-105 transition"
+                onclick="showAdventureForm()"
+              >
+                ➕ Add New Adventure
+              </button>
+            </div>
+
+            <!-- Add Adventure Form -->
+            <div
+              id="adventure-form"
+              class="hidden bg-[#1F3B2D]/40 p-8 rounded-xl border border-white/10 mb-8"
+            >
+              <h3 class="text-xl font-bold mb-6">Add New Adventure</h3>
+              <div class="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Adventure Title"
+                  class="input-field w-full"
+                  id="adv-title"
+                />
+                <select class="input-field w-full" id="adv-difficulty">
+                  <option value="">Select Difficulty</option>
+                  <option value="easy">Easy</option>
+                  <option value="medium">Medium</option>
+                  <option value="hard">Hard</option>
+                </select>
+                <input
+                  type="text"
+                  placeholder="Location"
+                  class="input-field w-full"
+                  id="adv-location"
+                />
+                <input
+                  type="text"
+                  placeholder="Duration (e.g., 7 days)"
+                  class="input-field w-full"
+                  id="adv-duration"
+                />
+                <input
+                  type="text"
+                  placeholder="Price (e.g., $2,499)"
+                  class="input-field w-full"
+                  id="adv-price"
+                />
+                <textarea
+                  placeholder="Description"
+                  class="input-field w-full resize-none"
+                  rows="3"
+                  id="adv-desc"
+                ></textarea>
+                <input
+                  type="text"
+                  placeholder="Image URL"
+                  class="input-field w-full"
+                  id="adv-image"
+                />
+                <div class="flex gap-3">
+                  <button
+                    class="flex-1 px-4 py-3 rounded-full bg-[#D4AF37] text-black font-semibold hover:scale-105 transition"
+                    onclick="addNewAdventure()"
+                  >
+                    Save Adventure
+                  </button>
+                  <button
+                    class="flex-1 px-4 py-3 rounded-full border border-white/30 hover:bg-white/10 transition"
+                    onclick="hideAdventureForm()"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Adventures List -->
+            <div id="adventures-list" class="space-y-4">
+              <!-- Will be populated by JavaScript -->
+            </div>
+          </div>
+
+          <!-- Submissions Tab -->
+          <div id="submissions-tab" class="admin-tab hidden">
+            <h2 class="text-2xl font-bold mb-6 text-[#D4AF37]">
+              Contact & Newsletter Submissions
+            </h2>
+            <div id="submissions-list" class="space-y-4">
+              <!-- Will be populated by JavaScript -->
+            </div>
+          </div>
+
+          <!-- Analytics Tab -->
+          <div id="analytics-tab" class="admin-tab hidden">
+            <h2 class="text-2xl font-bold mb-6 text-[#D4AF37]">
+              Website Analytics
+            </h2>
+            <div class="grid md:grid-cols-4 gap-4 mb-8">
+              <div
+                class="bg-[#1F3B2D]/40 p-6 rounded-xl border border-white/10"
+              >
+                <p class="text-[#F5F1E8]/70 text-sm mb-2">Total Visits</p>
+                <p class="text-3xl font-bold text-[#D4AF37]" id="visits-count">
+                  0
+                </p>
+              </div>
+              <div
+                class="bg-[#1F3B2D]/40 p-6 rounded-xl border border-white/10"
+              >
+                <p class="text-[#F5F1E8]/70 text-sm mb-2">
+                  Newsletter Subscribers
+                </p>
+                <p class="text-3xl font-bold text-[#D4AF37]" id="subs-count">
+                  0
+                </p>
+              </div>
+              <div
+                class="bg-[#1F3B2D]/40 p-6 rounded-xl border border-white/10"
+              >
+                <p class="text-[#F5F1E8]/70 text-sm mb-2">Total Messages</p>
+                <p class="text-3xl font-bold text-[#D4AF37]" id="messages-count">
+                  0
+                </p>
+              </div>
+              <div
+                class="bg-[#1F3B2D]/40 p-6 rounded-xl border border-white/10"
+              >
+                <p class="text-[#F5F1E8]/70 text-sm mb-2">Wishlists</p>
+                <p class="text-3xl font-bold text-[#D4AF37]" id="wishlists-count">
+                  0
+                </p>
+              </div>
+            </div>
+
+            <div class="bg-[#1F3B2D]/40 p-6 rounded-xl border border-white/10">
+              <h3 class="text-lg font-bold mb-4">Top Stories</h3>
+              <div id="top-stories" class="space-y-2">
+                <!-- Will be populated by JavaScript -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Data
+      const storiesData = [
+        {
+          id: 1,
+          title: "Mystic Forests",
+          category: "forest",
+          description:
+            "Experience breathtaking cinematic journeys deep into untouched wilderness.",
+          fullDescription:
+            "Discover the hidden wonders of ancient forests. From the misty canopies of the Amazon to the serene bamboo groves of Asia, this journey reveals nature's most guarded secrets.",
+          image:
+            "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1200&auto=format&fit=crop",
+          duration: "45 min",
+          rating: 4.8,
+          viewers: 12500,
+        },
+        {
+          id: 2,
+          title: "Wildlife Kingdom",
+          category: "wildlife",
+          description:
+            "Explore cinematic wildlife adventures with immersive visual storytelling.",
+          fullDescription:
+            "Witness the raw beauty and power of the animal kingdom. Follow lions on the hunt, watch dolphins dance through crystal waters, and experience the majesty of nature's greatest creatures.",
+          image:
+            "https://images.unsplash.com/photo-1501706362039-c6e13b4e5f1d?q=80&w=1200&auto=format&fit=crop",
+          duration: "52 min",
+          rating: 4.9,
+          viewers: 18900,
+        },
+        {
+          id: 3,
+          title: "Frozen Mountains",
+          category: "mountains",
+          description:
+            "Witness breathtaking icy landscapes and cinematic mountain expeditions.",
+          fullDescription:
+            "Scale the world's highest peaks and explore arctic tundras. Experience the silence of snow-covered peaks and the breathtaking views from the roof of the world.",
+          image:
+            "https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=1200&auto=format&fit=crop",
+          duration: "48 min",
+          rating: 4.7,
+          viewers: 9800,
+        },
+        {
+          id: 4,
+          title: "Ocean Depths",
+          category: "ocean",
+          description:
+            "Dive into the mysteries of the deep sea and coral ecosystems.",
+          fullDescription:
+            "Explore bioluminescent creatures, vibrant coral reefs, and underwater canyons. A mesmerizing journey into Earth's final frontier.",
+          image:
+            "https://images.unsplash.com/photo-1505142468610-359e7d316be0?q=80&w=1200&auto=format&fit=crop",
+          duration: "41 min",
+          rating: 4.8,
+          viewers: 15400,
+        },
+        {
+          id: 5,
+          title: "Desert Chronicles",
+          category: "other",
+          description:
+            "Uncover the hidden life thriving in Earth's harshest environments.",
+          fullDescription:
+            "From the Sahara to the Gobi, witness how life adapts to extreme conditions. Sand dunes, mirages, and desert wildlife like you've never seen before.",
+          image:
+            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=1200&auto=format&fit=crop",
+          duration: "44 min",
+          rating: 4.6,
+          viewers: 8200,
+        },
+        {
+          id: 6,
+          title: "Polar Frontiers",
+          category: "mountains",
+          description:
+            "Journey to the Arctic and Antarctic for unprecedented wildlife encounters.",
+          fullDescription:
+            "Meet penguins, polar bears, and whales in their natural habitat. A visceral experience of Earth's most remote regions.",
+          image:
+            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=1200&auto=format&fit=crop",
+          duration: "50 min",
+          rating: 4.9,
+          viewers: 11600,
+        },
+      ];
+
+      const adventuresData = [
+        {
+          id: 1,
+          title: "Amazon Rainforest Trek",
+          difficulty: "medium",
+          duration: "7 days",
+          price: "$2,499",
+          location: "Brazil",
+          description: "Guided expedition through the heart of the Amazon.",
+          image:
+            "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop",
+        },
+        {
+          id: 2,
+          title: "Mt. Kilimanjaro Summit",
+          difficulty: "hard",
+          duration: "6 days",
+          price: "$3,299",
+          location: "Tanzania",
+          description: "Challenge yourself at Africa's highest peak.",
+          image:
+            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=1200&auto=format&fit=crop",
+        },
+        {
+          id: 3,
+          title: "Coral Reef Diving",
+          difficulty: "easy",
+          duration: "3 days",
+          price: "$1,199",
+          location: "Australia",
+          description: "Explore the Great Barrier Reef with professional guides.",
+          image:
+            "https://images.unsplash.com/photo-1505142468610-359e7d316be0?q=80&w=1200&auto=format&fit=crop",
+        },
+        {
+          id: 4,
+          title: "Safari Wildlife Expedition",
+          difficulty: "easy",
+          duration: "5 days",
+          price: "$2,099",
+          location: "Kenya",
+          description:
+            "Witness the great migration and incredible wildlife photography.",
+          image:
+            "https://images.unsplash.com/photo-1516426122078-c23e76319801?q=80&w=1200&auto=format&fit=crop",
+        },
+        {
+          id: 5,
+          title: "Himalayan Base Camp",
+          difficulty: "hard",
+          duration: "14 days",
+          price: "$4,999",
+          location: "Nepal",
+          description: "Trek to Everest Base Camp with expert mountaineers.",
+          image:
+            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=1200&auto=format&fit=crop",
+        },
+        {
+          id: 6,
+          title: "Nordic Northern Lights",
+          difficulty: "easy",
+          duration: "4 days",
+          price: "$1,699",
+          location: "Norway",
+          description: "Chase the magical Aurora Borealis in Scandinavia.",
+          image:
+            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=1200&auto=format&fit=crop",
+        },
+      ];
+
+      let wishlist = [];
+      let userRatings = {};
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", () => {
+        renderStories("all");
+        renderAdventures("all");
+        loadWishlist();
+      });
+
+      // Navigation
+      function setActiveNav(e) {
+        e.preventDefault();
+        document.querySelectorAll(".nav-link").forEach((link) => {
+          link.classList.remove("nav-active");
+        });
+        e.target.classList.add("nav-active");
+      }
+
+      function scrollToSection(id) {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+
+      // Search
+      function toggleSearch() {
+        const searchContainer = document.getElementById("search-container");
+        searchContainer.classList.toggle("hidden");
+        if (!searchContainer.classList.contains("hidden")) {
+          document.getElementById("search-input").focus();
+        }
+      }
+
+      function filterStories() {
+        const query = document
+          .getElementById("search-input")
+          .value.toLowerCase();
+        const filtered = storiesData.filter(
+          (story) =>
+            story.title.toLowerCase().includes(query) ||
+            story.description.toLowerCase().includes(query)
+        );
+        renderStories("all", filtered);
+      }
+
+      // Stories
+      function renderStories(category, data = null) {
+        const stories =
+          data ||
+          (category === "all"
+            ? storiesData
+            : storiesData.filter((s) => s.category === category));
+
+        const grid = document.getElementById("stories-grid");
+        grid.innerHTML = stories
+          .map(
+            (story) => `
+          <div class="group relative overflow-hidden rounded-[30px] bg-[#1F3B2D]/40 border border-white/10 hover:-translate-y-3 transition duration-500 shadow-2xl card-hover cursor-pointer" onclick="openStoryModal(${story.id})">
+            <div class="h-[450px] bg-cover bg-center group-hover:scale-110 transition duration-[3000ms]" style="background-image:url('${story.image}');"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+            <div class="absolute bottom-0 p-8 w-full">
+              <div class="flex items-start justify-between mb-3">
+                <h3 class="text-3xl font-bold" style="font-family:'Playfair Display', serif">${story.title}</h3>
+                <button class="heart-btn ${wishlist.includes(story.id) ? "active" : ""}" onclick="toggleWishlist(event, ${story.id})" title="Add to wishlist">❤️</button>
+              </div>
+              <p class="text-[#F5F1E8]/70 mb-4">${story.description}</p>
+              <div class="flex items-center justify-between">
+                <div class="text-sm text-[#D4AF37]/70">⭐ ${story.rating} • ${story.viewers.toLocaleString()} viewers</div>
+                <button class="text-[#D4AF37] hover:underline">Watch Now →</button>
+              </div>
+            </div>
+          </div>
+        `
+          )
+          .join("");
+      }
+
+      function filterByCategory(category) {
+        document
+          .querySelectorAll("#stories .filter-btn-active")
+          .forEach((btn) => btn.classList.remove("filter-btn-active"));
+        event.target.classList.add("filter-btn-active");
+        renderStories(category);
+      }
+
+      function openStoryModal(id) {
+        const story = storiesData.find((s) => s.id === id);
+        if (!story) return;
+
+        const modal = document.getElementById("story-modal");
+        const modalContent = document.getElementById("modal-content");
+
+        modalContent.innerHTML = `
+          <img src="${story.image}" class="w-full h-64 object-cover rounded-lg mb-6" />
+          <h2 class="text-4xl font-bold mb-4" style="font-family:'Playfair Display', serif">${story.title}</h2>
+          <div class="flex items-center gap-4 mb-6 text-sm text-[#F5F1E8]/70">
+            <span>⭐ ${story.rating}</span>
+            <span>👁️ ${story.viewers.toLocaleString()} viewers</span>
+            <span>⏱️ ${story.duration}</span>
+          </div>
+          <p class="text-[#F5F1E8]/80 mb-6 text-lg">${story.fullDescription}</p>
+          
+          <div class="mb-6">
+            <p class="text-[#D4AF37] mb-3 font-semibold">Rate this story:</p>
+            <div class="star-rating" id="rating-${id}">
+              ${[1, 2, 3, 4, 5]
+                .map(
+                  (star) => `
+                <span class="star ${userRatings[id] >= star ? "active" : ""}" onclick="rateStory(${id}, ${star})">★</span>
+              `
+                )
+                .join("")}
+            </div>
+          </div>
+          
+          <button class="w-full px-6 py-3 rounded-full bg-[#D4AF37] text-black font-semibold hover:scale-105 transition">
+            Watch Full Story
+          </button>
+        `;
+
+        modal.classList.remove("hidden");
+      }
+
+      function closeStoryModal(e) {
+        if (
+          e &&
+          e.target !== document.getElementById("story-modal")
+        )
+          return;
+        document.getElementById("story-modal").classList.add("hidden");
+      }
+
+      function rateStory(id, rating) {
+        userRatings[id] = rating;
+        const stars = document.querySelectorAll(`#rating-${id} .star`);
+        stars.forEach((star, index) => {
+          if (index + 1 <= rating) {
+            star.classList.add("active");
+          } else {
+            star.classList.remove("active");
+          }
+        });
+      }
+
+      // Adventures
+      function renderAdventures(difficulty) {
+        const adventures =
+          difficulty === "all"
+            ? adventuresData
+            : adventuresData.filter((a) => a.difficulty === difficulty);
+
+        const grid = document.getElementById("adventures-grid");
+        grid.innerHTML = adventures
+          .map(
+            (adv) => `
+          <div class="group relative overflow-hidden rounded-[20px] bg-[#1F3B2D]/40 border border-white/10 p-6 hover:-translate-y-3 transition duration-500 shadow-2xl card-hover">
+            <img src="${adv.image}" class="w-full h-64 object-cover rounded-lg mb-4 group-hover:scale-110 transition duration-[3000ms]" />
+            <div class="space-y-3">
+              <div class="flex items-start justify-between">
+                <div>
+                  <h3 class="text-2xl font-bold mb-2" style="font-family:'Playfair Display', serif">${adv.title}</h3>
+                  <span class="difficulty-badge difficulty-${adv.difficulty}">${adv.difficulty.toUpperCase()}</span>
+                </div>
+              </div>
+              <p class="text-[#F5F1E8]/70">${adv.description}</p>
+              <div class="text-sm text-[#F5F1E8]/60 space-y-1">
+                <div>📍 ${adv.location}</div>
+                <div>⏱️ ${adv.duration}</div>
+                <div class="text-[#D4AF37] font-semibold">${adv.price}</div>
+              </div>
+              <button class="w-full mt-4 px-4 py-3 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black transition">
+                Learn More
+              </button>
+            </div>
+          </div>
+        `
+          )
+          .join("");
+      }
+
+      function filterAdventuresByDifficulty(difficulty) {
+        renderAdventures(difficulty);
+      }
+
+      // Wishlist
+      function toggleWishlist(e, id) {
+        e.stopPropagation();
+        const index = wishlist.indexOf(id);
+        if (index > -1) {
+          wishlist.splice(index, 1);
+        } else {
+          wishlist.push(id);
+        }
+        localStorage.setItem("wildjourney-wishlist", JSON.stringify(wishlist));
+        updateWishlistUI();
+      }
+
+      function loadWishlist() {
+        const saved = localStorage.getItem("wildjourney-wishlist");
+        if (saved) {
+          wishlist = JSON.parse(saved);
+          updateWishlistUI();
+        }
+      }
+
+      function updateWishlistUI() {
+        document.getElementById("wishlist-count").textContent = wishlist.length;
+        document.getElementById("wishlist-badge").textContent = `(${wishlist.length})`;
+
+        const wishlistStories = storiesData.filter((s) =>
+          wishlist.includes(s.id)
+        );
+        const container = document.getElementById("wishlist-container");
+
+        if (wishlistStories.length === 0) {
+          container.innerHTML =
+            '<div class="col-span-full text-center py-12"><p class="text-[#F5F1E8]/60">No items in your wishlist yet. Click the ❤️ icon on stories to add them!</p></div>';
+        } else {
+          container.innerHTML = wishlistStories
+            .map(
+              (story) => `
+            <div class="group relative overflow-hidden rounded-[30px] bg-[#1F3B2D]/40 border border-white/10 hover:-translate-y-3 transition duration-500 shadow-2xl cursor-pointer" onclick="openStoryModal(${story.id})">
+              <div class="h-[450px] bg-cover bg-center group-hover:scale-110 transition duration-[3000ms]" style="background-image:url('${story.image}');"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+              <div class="absolute bottom-0 p-8 w-full">
+                <div class="flex items-start justify-between mb-3">
+                  <h3 class="text-3xl font-bold" style="font-family:'Playfair Display', serif">${story.title}</h3>
+                  <button class="heart-btn active" onclick="toggleWishlist(event, ${story.id})">❤️</button>
+                </div>
+                <p class="text-[#F5F1E8]/70 mb-4">${story.description}</p>
+                <button class="text-[#D4AF37] hover:underline">Watch Now →</button>
+              </div>
+            </div>
+          `
+            )
+            .join("");
+        }
+      }
+
+      // Forms
+      function handleNewsletter(e) {
+        e.preventDefault();
+        const form = document.getElementById("newsletter-form");
+        const message = document.getElementById("newsletter-message");
+
+        message.classList.remove("hidden");
+        form.style.opacity = "0.5";
+        form.style.pointerEvents = "none";
+
+        setTimeout(() => {
+          form.reset();
+          form.style.opacity = "1";
+          form.style.pointerEvents = "auto";
+          setTimeout(() => {
+            message.classList.add("hidden");
+          }, 3000);
+        }, 1500);
+      }
+
+      function handleContactSubmit(e) {
+        e.preventDefault();
+        const form = document.getElementById("contact-form");
+        const message = document.getElementById("contact-message");
+
+        message.classList.remove("hidden");
+        form.style.opacity = "0.5";
+        form.style.pointerEvents = "none";
+
+        setTimeout(() => {
+          form.reset();
+          form.style.opacity = "1";
+          form.style.pointerEvents = "auto";
+          setTimeout(() => {
+            message.classList.add("hidden");
+          }, 3000);
+        }, 1500);
+      }
+    </script>
+  </body>
+</html>
